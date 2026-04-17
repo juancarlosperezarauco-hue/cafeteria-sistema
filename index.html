@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>☕ Cafetería - Sistema</title>
+    <title>☕ Cafetería - Sistema de Gestión</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -13,13 +13,15 @@
             padding: 20px;
         }
         .container {
-            max-width: 900px;
+            max-width: 1000px;
             margin: 0 auto;
             background: #fff9f5;
             border-radius: 20px;
             padding: 30px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.2);
         }
+        
+        /* MENÚ DE NAVEGACIÓN */
         .nav-links {
             margin-bottom: 20px;
             padding-bottom: 15px;
@@ -39,30 +41,38 @@
             background: #d4a373;
             color: white;
         }
+        
         h1 {
             color: #3e2723;
             margin-bottom: 10px;
-            font-size: 2.5em;
+            font-size: 2.2em;
             display: flex;
             align-items: center;
             gap: 10px;
         }
         .subtitle {
             color: #6b4e3d;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #d4a373;
+            margin-bottom: 25px;
             padding-bottom: 15px;
+            border-bottom: 1px solid #e0d0c0;
+        }
+        
+        /* BOTONES */
+        .btn-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
         }
         .btn {
             background: #8b5e3c;
             color: white;
             border: none;
-            padding: 12px 24px;
+            padding: 12px 20px;
             border-radius: 30px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
             cursor: pointer;
-            margin: 5px 10px 5px 0;
             transition: all 0.3s;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
@@ -77,8 +87,10 @@
         .btn-danger:hover {
             background: #922b21;
         }
+        
+        /* RESULTADOS */
         #resultado {
-            margin-top: 30px;
+            margin-top: 20px;
             padding: 20px;
             background: white;
             border-radius: 15px;
@@ -103,6 +115,12 @@
             padding: 15px;
             border-radius: 10px;
         }
+        .warning {
+            color: #e67e22;
+            background: #fef5e7;
+            padding: 15px;
+            border-radius: 10px;
+        }
         .producto-item {
             padding: 10px;
             margin: 5px 0;
@@ -118,14 +136,15 @@
             padding: 3px 10px;
             border-radius: 20px;
             font-size: 14px;
+            font-weight: bold;
         }
-        .loading {
-            display: inline-block;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .categoria-titulo {
+            margin-top: 20px;
+            margin-bottom: 10px;
+            color: #6b4e3d;
+            font-size: 18px;
+            border-bottom: 1px dashed #d4a373;
+            padding-bottom: 5px;
         }
     </style>
 </head>
@@ -137,34 +156,39 @@
             <a href="/reportes.html">📊 Reportes</a>
         </div>
         
-        <h1>
-            <span>☕</span> 
-            Cafetería Artesanal
-        </h1>
+        <h1>☕ Cafetería Artesanal</h1>
         <p class="subtitle">Sistema de Gestión - Desplegado en Render</p>
         
-        <div style="margin-bottom: 20px;">
+        <div class="btn-container">
             <button class="btn" onclick="probarLogin()">🔐 Iniciar Sesión (Admin)</button>
-            <button class="btn" onclick="verProductos()">📋 Ver Menú</button>
+            <button class="btn" onclick="verProductos()">📋 Ver Menú Completo</button>
             <button class="btn" onclick="verificarSesion()">👤 Estado de Sesión</button>
             <button class="btn btn-danger" onclick="logout()">🚪 Cerrar Sesión</button>
         </div>
         
         <div id="resultado">
-            <p class="info">☕ Bienvenido al sistema de la cafetería.<br>
-            🔐 Inicia sesión con: admin@cafeteria.com / Admin123!</p>
+            <p class="info">
+                ☕ <strong>Bienvenido al Sistema de Cafetería</strong><br>
+                🔐 Credenciales de prueba:<br>
+                &nbsp;&nbsp;&nbsp;Email: <code>admin@cafeteria.com</code><br>
+                &nbsp;&nbsp;&nbsp;Password: <code>Admin123!</code>
+            </p>
         </div>
     </div>
 
     <script type="module">
+        // =============================================
         // CONFIGURACIÓN - CREDENCIALES REALES
+        // =============================================
         const SUPABASE_URL = 'https://knciklpjeboeznbvajil.supabase.co'
         const SUPABASE_KEY = 'sb_publishable_8xwi4BOCYmqXx-VqdXuZwA_cmd5CeNj'
         
         import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
         const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
         
-        // Funciones globales
+        // =============================================
+        // FUNCIÓN: Probar Login
+        // =============================================
         window.probarLogin = async function() {
             const div = document.getElementById('resultado')
             div.innerHTML = '<p class="info">⏳ Iniciando sesión...</p>'
@@ -181,24 +205,27 @@
                 </div>`
             } else {
                 div.innerHTML = `<div class="success">
-                    <h3>✅ ¡Bienvenido!</h3>
+                    <h3>✅ ¡Login Exitoso!</h3>
                     <p><strong>Usuario:</strong> ${data.user.email}</p>
-                    <p><strong>Rol:</strong> Administrador</p>
+                    <p><strong>ID:</strong> ${data.user.id}</p>
                     <p><strong>Último acceso:</strong> ${new Date(data.user.last_sign_in_at).toLocaleString('es')}</p>
                 </div>`
             }
         }
         
+        // =============================================
+        // FUNCIÓN: Ver Productos (con categorías)
+        // =============================================
         window.verProductos = async function() {
             const div = document.getElementById('resultado')
             const { data: { session } } = await supabase.auth.getSession()
             
             if (!session) {
-                div.innerHTML = '<div class="error"><h3>⚠️ No hay sesión activa</h3><p>Inicia sesión primero</p></div>'
+                div.innerHTML = '<div class="warning"><h3>⚠️ No hay sesión activa</h3><p>Por favor, inicia sesión primero.</p></div>'
                 return
             }
             
-            div.innerHTML = '<p class="info">⏳ Cargando menú...</p>'
+            div.innerHTML = '<p class="info">⏳ Cargando menú completo...</p>'
             
             const { data: productos, error } = await supabase
                 .from('productos')
@@ -208,26 +235,36 @@
             
             if (error) {
                 div.innerHTML = `<div class="error"><h3>❌ Error</h3><p>${error.message}</p></div>`
-            } else {
-                let html = '<h3>📋 Nuestro Menú</h3>'
-                let categoriaActual = ''
-                
-                productos.forEach(p => {
-                    const catNombre = p.categorias?.nombre || 'Sin categoría'
-                    if (catNombre !== categoriaActual) {
-                        categoriaActual = catNombre
-                        html += `<h4 style="margin-top:20px; color:#6b4e3d;">${catNombre}</h4>`
-                    }
-                    html += `<div class="producto-item">
-                        <span>${p.nombre}</span>
-                        <span class="badge">$${p.precio}</span>
-                    </div>`
-                })
-                
-                div.innerHTML = `<div class="success">${html}</div>`
+                return
             }
+            
+            if (!productos || productos.length === 0) {
+                div.innerHTML = '<div class="warning"><h3>📋 Menú vacío</h3><p>No hay productos disponibles.</p></div>'
+                return
+            }
+            
+            // Agrupar por categoría
+            let html = '<h3>📋 Nuestro Menú Completo</h3>'
+            let categoriaActual = ''
+            
+            productos.forEach(p => {
+                const catNombre = p.categorias?.nombre || 'Sin categoría'
+                if (catNombre !== categoriaActual) {
+                    categoriaActual = catNombre
+                    html += `<div class="categoria-titulo">${catNombre}</div>`
+                }
+                html += `<div class="producto-item">
+                    <span>${p.nombre}</span>
+                    <span class="badge">$${Number(p.precio).toFixed(2)}</span>
+                </div>`
+            })
+            
+            div.innerHTML = `<div class="success">${html}</div>`
         }
         
+        // =============================================
+        // FUNCIÓN: Verificar Sesión
+        // =============================================
         window.verificarSesion = async function() {
             const div = document.getElementById('resultado')
             const { data: { session } } = await supabase.auth.getSession()
@@ -237,24 +274,31 @@
                     <h3>✅ Sesión Activa</h3>
                     <p><strong>Usuario:</strong> ${session.user.email}</p>
                     <p><strong>Expira:</strong> ${new Date(session.expires_at * 1000).toLocaleString('es')}</p>
+                    <p><strong>Token válido:</strong> Sí</p>
                 </div>`
             } else {
-                div.innerHTML = '<div class="info"><h3>ℹ️ Sin sesión</h3><p>Inicia sesión para acceder</p></div>'
+                div.innerHTML = '<div class="info"><h3>ℹ️ Sin sesión activa</h3><p>Inicia sesión para acceder a todas las funciones.</p></div>'
             }
         }
         
+        // =============================================
+        // FUNCIÓN: Cerrar Sesión
+        // =============================================
         window.logout = async function() {
             const div = document.getElementById('resultado')
             await supabase.auth.signOut()
-            div.innerHTML = '<div class="success"><h3>👋 Sesión cerrada</h3><p>¡Hasta pronto!</p></div>'
+            div.innerHTML = '<div class="success"><h3>👋 Sesión Cerrada</h3><p>¡Hasta pronto!</p></div>'
         }
         
-        // Verificar sesión al cargar
+        // =============================================
+        // VERIFICAR SESIÓN AL CARGAR LA PÁGINA
+        // =============================================
         const { data: { session } } = await supabase.auth.getSession()
         if (session) {
             document.getElementById('resultado').innerHTML = `<div class="success">
-                <h3>✅ Sesión activa</h3>
-                <p>Bienvenido de vuelta, ${session.user.email}</p>
+                <h3>✅ Sesión Activa Detectada</h3>
+                <p>Bienvenido de vuelta, <strong>${session.user.email}</strong></p>
+                <p>Puedes ver el menú o verificar tu sesión.</p>
             </div>`
         }
     </script>
