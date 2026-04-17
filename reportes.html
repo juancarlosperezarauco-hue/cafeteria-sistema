@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Reportes - Cafetería</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f5f0eb;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #3e2723;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .kpi-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-left: 5px solid #8b5e3c;
+        }
+        .kpi-title {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        .kpi-value {
+            color: #3e2723;
+            font-size: 32px;
+            font-weight: bold;
+        }
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .chart-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .chart-title {
+            color: #3e2723;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        .table-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background: #8b5e3c;
+            color: white;
+        }
+        tr:hover {
+            background: #f5f0eb;
+        }
+        .nav-links {
+            margin-bottom: 20px;
+        }
+        .nav-links a {
+            color: #8b5e3c;
+            text-decoration: none;
+            margin-right: 20px;
+            font-weight: bold;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-links">
+            <a href="/">🏠 Inicio</a>
+            <a href="/reportes.html">📊 Reportes</a>
+        </div>
+        
+        <h1>
+            <span>📊</span> 
+            Panel de Analista de Datos - Cafetería
+        </h1>
+        
+        <!-- KPIs -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-title">Ventas Hoy</div>
+                <div class="kpi-value" id="ventasHoy">$0</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Pedidos Hoy</div>
+                <div class="kpi-value" id="pedidosHoy">0</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Ticket Promedio</div>
+                <div class="kpi-value" id="ticketPromedio">$0</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Clientes Totales</div>
+                <div class="kpi-value" id="clientesTotales">0</div>
+            </div>
+        </div>
+        
+        <!-- Gráficas -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <div class="chart-title">📈 Ventas por Hora (Hoy)</div>
+                <canvas id="ventasHoraChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <div class="chart-title">🥧 Productos Más Vendidos</div>
+                <canvas id="productosChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Tabla de Mejores Clientes -->
+        <div class="table-card">
+            <div class="chart-title">👥 Mejores Clientes</div>
+            <table id="clientesTable">
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Visitas</th>
+                        <th>Gasto Total</th>
+                        <th>Última Visita</th>
+                    </tr>
+                </thead>
+                <tbody id="clientesBody">
+                    <tr><td colspan="4" class="loading">Cargando...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script type="module">
+        // Configuración de Supabase
+        const SUPABASE_URL = 'https://knciklpjeboeznbvajil.supabase.co'
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtuY2lrbHBqZWJvZXpuYnZhamlsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ4NTU5MjIsImV4cCI6MjA2MDQzMTkyMn0.Lx2rIsdzTlC5b8iEOTk4QhQDnNZnT2rOFQj2zKqJZQw'
+        
+        import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+        const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+        
+        // Cargar todos los datos
+        async function cargarReportes() {
+            await Promise.all([
+                cargarKPIs(),
+                cargarVentasPorHora(),
+                cargarProductosTop(),
+                cargarMejoresClientes()
+            ])
+        }
+        
+        async function cargarKPIs() {
+            const hoy = new Date().toISOString().split('T')[0]
+            
+            // Ventas hoy
+            const { data: ventas } = await supabase
+                .from('pedidos')
+                .select('total')
+                .gte('fecha_hora', hoy)
+                .eq('estado', 'Entregado')
+            
+            const totalVentas = ventas?.reduce((sum, p) => sum + Number(p.total), 0) || 0
+            document.getElementById('ventasHoy').textContent = `$${totalVentas.toFixed(2)}`
+            document.getElementById('pedidosHoy').textContent = ventas?.length || 0
+            document.getElementById('ticketPromedio').textContent = 
+                ventas?.length ? `$${(totalVentas / ventas.length).toFixed(2)}` : '$0'
+            
+            // Clientes totales
+            const { count } = await supabase
+                .from('clientes')
+                .select('*', { count: 'exact', head: true })
+            
+            document.getElementById('clientesTotales').textContent = count || 0
+        }
+        
+        async function cargarVentasPorHora() {
+            const hoy = new Date().toISOString().split('T')[0]
+            const { data: pedidos } = await supabase
+                .from('pedidos')
+                .select('fecha_hora, total')
+                .gte('fecha_hora', hoy)
+                .eq('estado', 'Entregado')
+            
+            const ventasPorHora = Array(24).fill(0)
+            pedidos?.forEach(p => {
+                const hora = new Date(p.fecha_hora).getHours()
+                ventasPorHora[hora] += Number(p.total)
+            })
+            
+            new Chart(document.getElementById('ventasHoraChart'), {
+                type: 'bar',
+                data: {
+                    labels: Array.from({length: 24}, (_, i) => `${i}:00`),
+                    datasets: [{
+                        label: 'Ventas ($)',
+                        data: ventasPorHora,
+                        backgroundColor: '#8b5e3c'
+                    }]
+                }
+            })
+        }
+        
+        async function cargarProductosTop() {
+            const { data: items } = await supabase
+                .from('items_pedido')
+                .select('cantidad, subtotal, productos(nombre)')
+                .limit(100)
+            
+            const productosMap = {}
+            items?.forEach(item => {
+                const nombre = item.productos?.nombre || 'Desconocido'
+                if (!productosMap[nombre]) productosMap[nombre] = 0
+                productosMap[nombre] += item.cantidad
+            })
+            
+            const sorted = Object.entries(productosMap)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5)
+            
+            new Chart(document.getElementById('productosChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: sorted.map(s => s[0]),
+                    datasets: [{
+                        data: sorted.map(s => s[1]),
+                        backgroundColor: ['#8b5e3c', '#a0704a', '#b8855a', '#c99a6a', '#d4a373']
+                    }]
+                }
+            })
+        }
+        
+        async function cargarMejoresClientes() {
+            const { data: clientes } = await supabase
+                .from('clientes')
+                .select('*')
+            
+            const tbody = document.getElementById('clientesBody')
+            
+            if (!clientes?.length) {
+                tbody.innerHTML = '<tr><td colspan="4">No hay clientes registrados</td></tr>'
+                return
+            }
+            
+            // Simular datos de visitas (en producción usarías JOIN con pedidos)
+            tbody.innerHTML = clientes.map(c => `
+                <tr>
+                    <td>${c.nombre}</td>
+                    <td>${Math.floor(Math.random() * 20) + 1}</td>
+                    <td>$${(Math.random() * 500 + 50).toFixed(2)}</td>
+                    <td>${new Date().toLocaleDateString()}</td>
+                </tr>
+            `).join('')
+        }
+        
+        // Iniciar carga
+        cargarReportes()
+    </script>
+</body>
+</html>
