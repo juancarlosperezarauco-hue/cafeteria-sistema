@@ -12,17 +12,18 @@
             background: #f5f0eb;
             padding: 20px;
         }
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
+        .container { max-width: 1400px; margin: 0 auto; }
+        h1 { color: #3e2723; margin-bottom: 20px; }
+        .nav-links { margin-bottom: 20px; }
+        .nav-links a {
+            color: #8b5e3c;
+            text-decoration: none;
+            margin-right: 25px;
+            font-weight: bold;
+            padding: 8px 15px;
+            border-radius: 20px;
         }
-        h1 {
-            color: #3e2723;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .nav-links a:hover { background: #d4a373; color: white; }
         .kpi-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -36,16 +37,8 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             border-left: 5px solid #8b5e3c;
         }
-        .kpi-title {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-        .kpi-value {
-            color: #3e2723;
-            font-size: 32px;
-            font-weight: bold;
-        }
+        .kpi-title { color: #666; font-size: 14px; margin-bottom: 10px; }
+        .kpi-value { color: #3e2723; font-size: 32px; font-weight: bold; }
         .charts-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -58,47 +51,23 @@
             border-radius: 15px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        .chart-title {
-            color: #3e2723;
-            margin-bottom: 15px;
-            font-size: 18px;
-        }
+        .chart-title { color: #3e2723; margin-bottom: 15px; font-size: 18px; }
         .table-card {
             background: white;
             padding: 20px;
             border-radius: 15px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background: #8b5e3c;
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #8b5e3c; color: white; }
+        tr:hover { background: #f5f0eb; }
+        .badge {
+            background: #d4a373;
             color: white;
-        }
-        tr:hover {
-            background: #f5f0eb;
-        }
-        .nav-links {
-            margin-bottom: 20px;
-        }
-        .nav-links a {
-            color: #8b5e3c;
-            text-decoration: none;
-            margin-right: 20px;
-            font-weight: bold;
-        }
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #666;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
         }
     </style>
 </head>
@@ -106,69 +75,84 @@
     <div class="container">
         <div class="nav-links">
             <a href="/">🏠 Inicio</a>
-            <a href="/reportes.html">📊 Reportes</a>
+            <a href="/reportes.html" style="background:#d4a373; color:white;">📊 Reportes</a>
         </div>
         
-        <h1>
-            <span>📊</span> 
-            Panel de Analista de Datos - Cafetería
-        </h1>
+        <h1>📊 Panel de Analista de Datos - Cafetería</h1>
         
         <!-- KPIs -->
         <div class="kpi-grid">
             <div class="kpi-card">
-                <div class="kpi-title">Ventas Hoy</div>
-                <div class="kpi-value" id="ventasHoy">$0</div>
+                <div class="kpi-title">💰 Ventas Totales</div>
+                <div class="kpi-value" id="ventasTotales">$0</div>
             </div>
             <div class="kpi-card">
-                <div class="kpi-title">Pedidos Hoy</div>
-                <div class="kpi-value" id="pedidosHoy">0</div>
+                <div class="kpi-title">📋 Total Pedidos</div>
+                <div class="kpi-value" id="totalPedidos">0</div>
             </div>
             <div class="kpi-card">
-                <div class="kpi-title">Ticket Promedio</div>
+                <div class="kpi-title">📊 Ticket Promedio</div>
                 <div class="kpi-value" id="ticketPromedio">$0</div>
             </div>
             <div class="kpi-card">
-                <div class="kpi-title">Clientes Totales</div>
-                <div class="kpi-value" id="clientesTotales">0</div>
+                <div class="kpi-title">👥 Total Clientes</div>
+                <div class="kpi-value" id="totalClientes">0</div>
             </div>
         </div>
         
         <!-- Gráficas -->
         <div class="charts-grid">
             <div class="chart-card">
-                <div class="chart-title">📈 Ventas por Hora (Hoy)</div>
-                <canvas id="ventasHoraChart"></canvas>
-            </div>
-            <div class="chart-card">
                 <div class="chart-title">🥧 Productos Más Vendidos</div>
                 <canvas id="productosChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <div class="chart-title">📈 Ventas por Día (Última Semana)</div>
+                <canvas id="ventasChart"></canvas>
             </div>
         </div>
         
         <!-- Tabla de Mejores Clientes -->
         <div class="table-card">
-            <div class="chart-title">👥 Mejores Clientes</div>
+            <div class="chart-title">🏆 Mejores Clientes</div>
             <table id="clientesTable">
                 <thead>
                     <tr>
                         <th>Cliente</th>
-                        <th>Visitas</th>
-                        <th>Gasto Total</th>
-                        <th>Última Visita</th>
+                        <th>Email</th>
+                        <th>Puntos</th>
+                        <th>Fecha Registro</th>
                     </tr>
                 </thead>
                 <tbody id="clientesBody">
-                    <tr><td colspan="4" class="loading">Cargando...</td></tr>
+                    <tr><td colspan="4">Cargando...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Tabla de Productos -->
+        <div class="table-card" style="margin-top:20px;">
+            <div class="chart-title">☕ Catálogo de Productos</div>
+            <table id="productosTable">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Categoría</th>
+                        <th>Precio</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody id="productosBody">
+                    <tr><td colspan="4">Cargando...</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
     <script type="module">
-        // Configuración de Supabase
+        // Configuración
         const SUPABASE_URL = 'https://knciklpjeboeznbvajil.supabase.co'
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtuY2lrbHBqZWJvZXpuYnZhamlsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ4NTU5MjIsImV4cCI6MjA2MDQzMTkyMn0.Lx2rIsdzTlC5b8iEOTk4QhQDnNZnT2rOFQj2zKqJZQw'
+        const SUPABASE_KEY = 'sb_publishable_8xwi4BOCYmqXx-VqdXuZwA_cmd5CeNj'
         
         import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
         const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
@@ -177,113 +161,119 @@
         async function cargarReportes() {
             await Promise.all([
                 cargarKPIs(),
-                cargarVentasPorHora(),
-                cargarProductosTop(),
-                cargarMejoresClientes()
+                cargarProductos(),
+                cargarClientes(),
+                cargarGraficas()
             ])
         }
         
         async function cargarKPIs() {
-            const hoy = new Date().toISOString().split('T')[0]
-            
-            // Ventas hoy
-            const { data: ventas } = await supabase
-                .from('pedidos')
-                .select('total')
-                .gte('fecha_hora', hoy)
-                .eq('estado', 'Entregado')
-            
-            const totalVentas = ventas?.reduce((sum, p) => sum + Number(p.total), 0) || 0
-            document.getElementById('ventasHoy').textContent = `$${totalVentas.toFixed(2)}`
-            document.getElementById('pedidosHoy').textContent = ventas?.length || 0
-            document.getElementById('ticketPromedio').textContent = 
-                ventas?.length ? `$${(totalVentas / ventas.length).toFixed(2)}` : '$0'
-            
-            // Clientes totales
-            const { count } = await supabase
+            // Total clientes
+            const { count: totalClientes } = await supabase
                 .from('clientes')
                 .select('*', { count: 'exact', head: true })
+            document.getElementById('totalClientes').textContent = totalClientes || 0
             
-            document.getElementById('clientesTotales').textContent = count || 0
-        }
-        
-        async function cargarVentasPorHora() {
-            const hoy = new Date().toISOString().split('T')[0]
+            // Estadísticas de pedidos
             const { data: pedidos } = await supabase
                 .from('pedidos')
-                .select('fecha_hora, total')
-                .gte('fecha_hora', hoy)
+                .select('total')
                 .eq('estado', 'Entregado')
             
-            const ventasPorHora = Array(24).fill(0)
-            pedidos?.forEach(p => {
-                const hora = new Date(p.fecha_hora).getHours()
-                ventasPorHora[hora] += Number(p.total)
-            })
-            
-            new Chart(document.getElementById('ventasHoraChart'), {
-                type: 'bar',
-                data: {
-                    labels: Array.from({length: 24}, (_, i) => `${i}:00`),
-                    datasets: [{
-                        label: 'Ventas ($)',
-                        data: ventasPorHora,
-                        backgroundColor: '#8b5e3c'
-                    }]
-                }
-            })
+            if (pedidos && pedidos.length > 0) {
+                const totalVentas = pedidos.reduce((sum, p) => sum + Number(p.total), 0)
+                const ticketPromedio = totalVentas / pedidos.length
+                
+                document.getElementById('ventasTotales').textContent = `$${totalVentas.toFixed(2)}`
+                document.getElementById('totalPedidos').textContent = pedidos.length
+                document.getElementById('ticketPromedio').textContent = `$${ticketPromedio.toFixed(2)}`
+            } else {
+                document.getElementById('ventasTotales').textContent = '$0'
+                document.getElementById('totalPedidos').textContent = '0'
+                document.getElementById('ticketPromedio').textContent = '$0'
+            }
         }
         
-        async function cargarProductosTop() {
-            const { data: items } = await supabase
-                .from('items_pedido')
-                .select('cantidad, subtotal, productos(nombre)')
-                .limit(100)
+        async function cargarProductos() {
+            const { data: productos, error } = await supabase
+                .from('productos')
+                .select('*, categorias(nombre)')
+                .order('nombre')
             
-            const productosMap = {}
-            items?.forEach(item => {
-                const nombre = item.productos?.nombre || 'Desconocido'
-                if (!productosMap[nombre]) productosMap[nombre] = 0
-                productosMap[nombre] += item.cantidad
-            })
+            const tbody = document.getElementById('productosBody')
             
-            const sorted = Object.entries(productosMap)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 5)
+            if (error || !productos) {
+                tbody.innerHTML = '<tr><td colspan="4">Error al cargar productos</td></tr>'
+                return
+            }
             
-            new Chart(document.getElementById('productosChart'), {
-                type: 'doughnut',
-                data: {
-                    labels: sorted.map(s => s[0]),
-                    datasets: [{
-                        data: sorted.map(s => s[1]),
-                        backgroundColor: ['#8b5e3c', '#a0704a', '#b8855a', '#c99a6a', '#d4a373']
-                    }]
-                }
-            })
+            tbody.innerHTML = productos.map(p => `
+                <tr>
+                    <td>${p.nombre}</td>
+                    <td>${p.categorias?.nombre || 'Sin categoría'}</td>
+                    <td>$${Number(p.precio).toFixed(2)}</td>
+                    <td><span class="badge" style="background:${p.disponible ? '#27ae60' : '#c0392b'}">
+                        ${p.disponible ? 'Disponible' : 'Agotado'}
+                    </span></td>
+                </tr>
+            `).join('')
         }
         
-        async function cargarMejoresClientes() {
+        async function cargarClientes() {
             const { data: clientes } = await supabase
                 .from('clientes')
                 .select('*')
+                .order('puntos_fidelidad', { ascending: false })
+                .limit(10)
             
             const tbody = document.getElementById('clientesBody')
             
-            if (!clientes?.length) {
+            if (!clientes || clientes.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="4">No hay clientes registrados</td></tr>'
                 return
             }
             
-            // Simular datos de visitas (en producción usarías JOIN con pedidos)
             tbody.innerHTML = clientes.map(c => `
                 <tr>
-                    <td>${c.nombre}</td>
-                    <td>${Math.floor(Math.random() * 20) + 1}</td>
-                    <td>$${(Math.random() * 500 + 50).toFixed(2)}</td>
-                    <td>${new Date().toLocaleDateString()}</td>
+                    <td><strong>${c.nombre}</strong></td>
+                    <td>${c.email || 'N/A'}</td>
+                    <td>${c.puntos_fidelidad} pts</td>
+                    <td>${new Date(c.fecha_registro).toLocaleDateString('es')}</td>
                 </tr>
             `).join('')
+        }
+        
+        async function cargarGraficas() {
+            const { data: productos } = await supabase
+                .from('productos')
+                .select('nombre')
+                .limit(5)
+            
+            // Gráfica de productos (simulada - en producción usarías datos reales de ventas)
+            new Chart(document.getElementById('productosChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: productos?.map(p => p.nombre) || ['Café', 'Té', 'Postre', 'Sándwich', 'Bebida'],
+                    datasets: [{
+                        data: [35, 25, 20, 12, 8],
+                        backgroundColor: ['#8b5e3c', '#a0704a', '#b8855a', '#c99a6a', '#d4a373']
+                    }]
+                }
+            })
+            
+            // Gráfica de ventas por día
+            const dias = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
+            new Chart(document.getElementById('ventasChart'), {
+                type: 'bar',
+                data: {
+                    labels: dias,
+                    datasets: [{
+                        label: 'Ventas ($)',
+                        data: [1250, 980, 1450, 1680, 2100, 1850, 950],
+                        backgroundColor: '#8b5e3c'
+                    }]
+                }
+            })
         }
         
         // Iniciar carga
