@@ -1,48 +1,173 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Test Simple Cafetería</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>☕ Cafetería - Sistema</title>
     <style>
-        body { font-family: Arial; padding: 20px; }
-        button { 
-            padding: 15px; 
-            margin: 10px; 
-            font-size: 16px; 
-            cursor: pointer;
-            background: #4CAF50;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #6b4e3d 0%, #3e2723 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff9f5;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        .nav-links {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #d4a373;
+        }
+        .nav-links a {
+            color: #8b5e3c;
+            text-decoration: none;
+            margin-right: 25px;
+            font-weight: bold;
+            font-size: 16px;
+            padding: 8px 15px;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+        .nav-links a:hover {
+            background: #d4a373;
+            color: white;
+        }
+        h1 {
+            color: #3e2723;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .subtitle {
+            color: #6b4e3d;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #d4a373;
+            padding-bottom: 15px;
+        }
+        .btn {
+            background: #8b5e3c;
             color: white;
             border: none;
-            border-radius: 5px;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 5px 10px 5px 0;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .btn:hover {
+            background: #3e2723;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        .btn-danger {
+            background: #c0392b;
+        }
+        .btn-danger:hover {
+            background: #922b21;
         }
         #resultado {
-            margin-top: 20px;
+            margin-top: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            border-left: 5px solid #d4a373;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+        .success {
+            color: #27ae60;
+            background: #e8f8f0;
             padding: 15px;
-            background: #f5f5f5;
-            border-radius: 5px;
+            border-radius: 10px;
+        }
+        .error {
+            color: #c0392b;
+            background: #fdecea;
+            padding: 15px;
+            border-radius: 10px;
+        }
+        .info {
+            color: #2980b9;
+            background: #ebf5fb;
+            padding: 15px;
+            border-radius: 10px;
+        }
+        .producto-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: #faf0e6;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .badge {
+            background: #d4a373;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        .loading {
+            display: inline-block;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <h1>☕ Test de Conexión - Cafetería</h1>
-    
-    <button onclick="probarLogin()">1️⃣ Probar Login</button>
-    <button onclick="verProductos()">2️⃣ Ver Productos</button>
-    <button onclick="verificarSesion()">3️⃣ Verificar Sesión</button>
-    
-    <div id="resultado">Esperando acción...</div>
+    <div class="container">
+        <!-- MENÚ DE NAVEGACIÓN -->
+        <div class="nav-links">
+            <a href="/">🏠 Inicio</a>
+            <a href="/reportes.html">📊 Reportes</a>
+        </div>
+        
+        <h1>
+            <span>☕</span> 
+            Cafetería Artesanal
+        </h1>
+        <p class="subtitle">Sistema de Gestión - Desplegado en Render</p>
+        
+        <div style="margin-bottom: 20px;">
+            <button class="btn" onclick="probarLogin()">🔐 Iniciar Sesión (Admin)</button>
+            <button class="btn" onclick="verProductos()">📋 Ver Menú</button>
+            <button class="btn" onclick="verificarSesion()">👤 Estado de Sesión</button>
+            <button class="btn btn-danger" onclick="logout()">🚪 Cerrar Sesión</button>
+        </div>
+        
+        <div id="resultado">
+            <p class="info">☕ Bienvenido al sistema de la cafetería.<br>
+            🔐 Inicia sesión con: admin@cafeteria.com / Admin123!</p>
+        </div>
+    </div>
 
     <script type="module">
-        // ⚠️ ¡CAMBIAR ESTOS DOS VALORES! ⚠️
-       const SUPABASE_URL = 'https://knciklpjeboeznbvajil.supabase.co'
+        // CONFIGURACIÓN - CREDENCIALES REALES
+        const SUPABASE_URL = 'https://knciklpjeboeznbvajil.supabase.co'
         const SUPABASE_KEY = 'sb_publishable_8xwi4BOCYmqXx-VqdXuZwA_cmd5CeNj'
         
         import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
         const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
         
+        // Funciones globales
         window.probarLogin = async function() {
             const div = document.getElementById('resultado')
-            div.innerHTML = '⏳ Intentando login...'
+            div.innerHTML = '<p class="info">⏳ Iniciando sesión...</p>'
             
             const { data, error } = await supabase.auth.signInWithPassword({
                 email: 'admin@cafeteria.com',
@@ -50,9 +175,17 @@
             })
             
             if (error) {
-                div.innerHTML = `<p style="color:red">❌ ERROR: ${error.message}</p>`
+                div.innerHTML = `<div class="error">
+                    <h3>❌ Error de Login</h3>
+                    <p>${error.message}</p>
+                </div>`
             } else {
-                div.innerHTML = `<p style="color:green">✅ LOGIN EXITOSO!<br>Usuario: ${data.user.email}</p>`
+                div.innerHTML = `<div class="success">
+                    <h3>✅ ¡Bienvenido!</h3>
+                    <p><strong>Usuario:</strong> ${data.user.email}</p>
+                    <p><strong>Rol:</strong> Administrador</p>
+                    <p><strong>Último acceso:</strong> ${new Date(data.user.last_sign_in_at).toLocaleString('es')}</p>
+                </div>`
             }
         }
         
@@ -61,17 +194,37 @@
             const { data: { session } } = await supabase.auth.getSession()
             
             if (!session) {
-                div.innerHTML = '<p style="color:orange">⚠️ Primero haz login</p>'
+                div.innerHTML = '<div class="error"><h3>⚠️ No hay sesión activa</h3><p>Inicia sesión primero</p></div>'
                 return
             }
             
-            const { data, error } = await supabase.from('productos').select('*').limit(5)
+            div.innerHTML = '<p class="info">⏳ Cargando menú...</p>'
+            
+            const { data: productos, error } = await supabase
+                .from('productos')
+                .select('*, categorias(nombre)')
+                .eq('disponible', true)
+                .order('nombre')
             
             if (error) {
-                div.innerHTML = `<p style="color:red">❌ Error: ${error.message}</p>`
+                div.innerHTML = `<div class="error"><h3>❌ Error</h3><p>${error.message}</p></div>`
             } else {
-                div.innerHTML = `<p style="color:green">✅ ${data.length} productos encontrados:<br>` +
-                    data.map(p => `• ${p.nombre} - $${p.precio}`).join('<br>') + '</p>'
+                let html = '<h3>📋 Nuestro Menú</h3>'
+                let categoriaActual = ''
+                
+                productos.forEach(p => {
+                    const catNombre = p.categorias?.nombre || 'Sin categoría'
+                    if (catNombre !== categoriaActual) {
+                        categoriaActual = catNombre
+                        html += `<h4 style="margin-top:20px; color:#6b4e3d;">${catNombre}</h4>`
+                    }
+                    html += `<div class="producto-item">
+                        <span>${p.nombre}</span>
+                        <span class="badge">$${p.precio}</span>
+                    </div>`
+                })
+                
+                div.innerHTML = `<div class="success">${html}</div>`
             }
         }
         
@@ -80,10 +233,29 @@
             const { data: { session } } = await supabase.auth.getSession()
             
             if (session) {
-                div.innerHTML = `<p style="color:green">✅ Sesión activa: ${session.user.email}</p>`
+                div.innerHTML = `<div class="success">
+                    <h3>✅ Sesión Activa</h3>
+                    <p><strong>Usuario:</strong> ${session.user.email}</p>
+                    <p><strong>Expira:</strong> ${new Date(session.expires_at * 1000).toLocaleString('es')}</p>
+                </div>`
             } else {
-                div.innerHTML = '<p style="color:blue">ℹ️ No hay sesión activa</p>'
+                div.innerHTML = '<div class="info"><h3>ℹ️ Sin sesión</h3><p>Inicia sesión para acceder</p></div>'
             }
+        }
+        
+        window.logout = async function() {
+            const div = document.getElementById('resultado')
+            await supabase.auth.signOut()
+            div.innerHTML = '<div class="success"><h3>👋 Sesión cerrada</h3><p>¡Hasta pronto!</p></div>'
+        }
+        
+        // Verificar sesión al cargar
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session) {
+            document.getElementById('resultado').innerHTML = `<div class="success">
+                <h3>✅ Sesión activa</h3>
+                <p>Bienvenido de vuelta, ${session.user.email}</p>
+            </div>`
         }
     </script>
 </body>
