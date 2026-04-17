@@ -3,99 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📊 Reportes - Cafetería</title>
+    <title>Reportes · Cafetería</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: #f5f0eb;
-            padding: 20px;
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #F5F0E8;
+            min-height: 100vh;
+            padding: 24px;
+            color: #3A3A3A;
         }
-        .container { max-width: 1400px; margin: 0 auto; }
-        h1 { color: #3e2723; margin-bottom: 20px; }
-        .nav-links { margin-bottom: 20px; }
-        .nav-links a {
-            color: #8b5e3c;
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        /* Navegación */
+        .nav {
+            display: flex;
+            gap: 32px;
+            padding-bottom: 20px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid rgba(156, 175, 136, 0.2);
+        }
+
+        .nav a {
+            color: #5C7A67;
             text-decoration: none;
-            margin-right: 25px;
-            font-weight: bold;
-            padding: 8px 15px;
-            border-radius: 20px;
+            font-size: 15px;
+            font-weight: 450;
+            transition: all 0.2s;
+            padding-bottom: 4px;
+            border-bottom: 2px solid transparent;
         }
-        .nav-links a:hover { background: #d4a373; color: white; }
+
+        .nav a:hover {
+            color: #3E5C4B;
+            border-bottom-color: #9CAF88;
+        }
+
+        .nav a.active {
+            color: #3E5C4B;
+            border-bottom-color: #9CAF88;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 450;
+            letter-spacing: -0.02em;
+            color: #3E5C4B;
+            margin-bottom: 28px;
+        }
+
+        /* KPIs */
         .kpi-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 32px;
         }
+
         .kpi-card {
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            border-left: 5px solid #8b5e3c;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            padding: 24px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
         }
-        .kpi-title { color: #666; font-size: 14px; margin-bottom: 10px; }
-        .kpi-value { color: #3e2723; font-size: 32px; font-weight: bold; }
+
+        .kpi-label {
+            font-size: 13px;
+            color: #7C9082;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .kpi-value {
+            font-size: 36px;
+            font-weight: 350;
+            color: #3E5C4B;
+            letter-spacing: -0.02em;
+        }
+
+        /* Gráficas */
         .charts-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            margin-bottom: 30px;
+            gap: 24px;
+            margin-bottom: 32px;
         }
+
         .chart-card {
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            padding: 24px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
         }
-        .chart-title { color: #3e2723; margin-bottom: 15px; font-size: 18px; }
-        .table-card {
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #5C7A67;
+            margin-bottom: 20px;
         }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background: #8b5e3c; color: white; }
-        tr:hover { background: #f5f0eb; }
+
+        /* Tablas */
+        .table-wrapper {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            padding: 24px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #5C7A67;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px 0;
+            font-weight: 450;
+            color: #7C9082;
+            font-size: 13px;
+            border-bottom: 1px solid rgba(156, 175, 136, 0.2);
+        }
+
+        td {
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(156, 175, 136, 0.1);
+            color: #3A3A3A;
+        }
+
         .badge {
-            background: #d4a373;
-            color: white;
-            padding: 3px 10px;
+            background: rgba(156, 175, 136, 0.15);
+            color: #5C7A67;
+            padding: 4px 10px;
             border-radius: 20px;
             font-size: 12px;
+        }
+
+        .badge-success {
+            background: rgba(92, 122, 103, 0.12);
+            color: #3E5C4B;
+        }
+
+        .badge-warning {
+            background: rgba(196, 164, 132, 0.12);
+            color: #9B7B5E;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="nav-links">
-            <a href="/">🏠 Inicio</a>
-            <a href="/reportes.html" style="background:#d4a373; color:white;">📊 Reportes</a>
+        <div class="nav">
+            <a href="/">Inicio</a>
+            <a href="/reportes.html" class="active">Reportes</a>
         </div>
         
-        <h1>📊 Panel de Analista de Datos - Cafetería</h1>
+        <h1>Análisis</h1>
         
         <!-- KPIs -->
         <div class="kpi-grid">
             <div class="kpi-card">
-                <div class="kpi-title">💰 Ventas Totales</div>
+                <div class="kpi-label">Ventas totales</div>
                 <div class="kpi-value" id="ventasTotales">$0</div>
             </div>
             <div class="kpi-card">
-                <div class="kpi-title">📋 Total Pedidos</div>
+                <div class="kpi-label">Pedidos</div>
                 <div class="kpi-value" id="totalPedidos">0</div>
             </div>
             <div class="kpi-card">
-                <div class="kpi-title">📊 Ticket Promedio</div>
+                <div class="kpi-label">Ticket promedio</div>
                 <div class="kpi-value" id="ticketPromedio">$0</div>
             </div>
             <div class="kpi-card">
-                <div class="kpi-title">👥 Total Clientes</div>
+                <div class="kpi-label">Clientes</div>
                 <div class="kpi-value" id="totalClientes">0</div>
             </div>
         </div>
@@ -103,37 +205,37 @@
         <!-- Gráficas -->
         <div class="charts-grid">
             <div class="chart-card">
-                <div class="chart-title">🥧 Productos Más Vendidos</div>
+                <div class="chart-title">Productos más populares</div>
                 <canvas id="productosChart"></canvas>
             </div>
             <div class="chart-card">
-                <div class="chart-title">📈 Ventas por Día (Última Semana)</div>
+                <div class="chart-title">Ventas · Última semana</div>
                 <canvas id="ventasChart"></canvas>
             </div>
         </div>
         
-        <!-- Tabla de Mejores Clientes -->
-        <div class="table-card">
-            <div class="chart-title">🏆 Mejores Clientes</div>
-            <table id="clientesTable">
+        <!-- Tabla de clientes -->
+        <div class="table-wrapper">
+            <div class="section-title">Clientes frecuentes</div>
+            <table>
                 <thead>
                     <tr>
-                        <th>Cliente</th>
-                        <th>Email</th>
+                        <th>Nombre</th>
+                        <th>Contacto</th>
                         <th>Puntos</th>
-                        <th>Fecha Registro</th>
+                        <th>Registro</th>
                     </tr>
                 </thead>
                 <tbody id="clientesBody">
-                    <tr><td colspan="4">Cargando...</td></tr>
+                    <tr><td colspan="4">Cargando información...</td></tr>
                 </tbody>
             </table>
         </div>
         
-        <!-- Tabla de Productos -->
-        <div class="table-card" style="margin-top:20px;">
-            <div class="chart-title">☕ Catálogo de Productos</div>
-            <table id="productosTable">
+        <!-- Tabla de productos -->
+        <div class="table-wrapper">
+            <div class="section-title">Catálogo</div>
+            <table>
                 <thead>
                     <tr>
                         <th>Producto</th>
@@ -143,141 +245,110 @@
                     </tr>
                 </thead>
                 <tbody id="productosBody">
-                    <tr><td colspan="4">Cargando...</td></tr>
+                    <tr><td colspan="4">Cargando catálogo...</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
     <script type="module">
-        // Configuración
         const SUPABASE_URL = 'https://knciklpjeboeznbvajil.supabase.co'
         const SUPABASE_KEY = 'sb_publishable_8xwi4BOCYmqXx-VqdXuZwA_cmd5CeNj'
         
         import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
         const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
         
-        // Cargar todos los datos
-        async function cargarReportes() {
-            await Promise.all([
-                cargarKPIs(),
-                cargarProductos(),
-                cargarClientes(),
-                cargarGraficas()
-            ])
+        async function cargarTodo() {
+            await Promise.all([cargarKPIs(), cargarProductos(), cargarClientes(), cargarGraficas()])
         }
         
         async function cargarKPIs() {
-            // Total clientes
-            const { count: totalClientes } = await supabase
-                .from('clientes')
-                .select('*', { count: 'exact', head: true })
+            const { count: totalClientes } = await supabase.from('clientes').select('*', { count: 'exact', head: true })
             document.getElementById('totalClientes').textContent = totalClientes || 0
             
-            // Estadísticas de pedidos
-            const { data: pedidos } = await supabase
-                .from('pedidos')
-                .select('total')
-                .eq('estado', 'Entregado')
+            const { data: pedidos } = await supabase.from('pedidos').select('total').eq('estado', 'Entregado')
             
             if (pedidos && pedidos.length > 0) {
-                const totalVentas = pedidos.reduce((sum, p) => sum + Number(p.total), 0)
-                const ticketPromedio = totalVentas / pedidos.length
-                
-                document.getElementById('ventasTotales').textContent = `$${totalVentas.toFixed(2)}`
+                const total = pedidos.reduce((sum, p) => sum + Number(p.total), 0)
+                document.getElementById('ventasTotales').textContent = `$${total.toFixed(0)}`
                 document.getElementById('totalPedidos').textContent = pedidos.length
-                document.getElementById('ticketPromedio').textContent = `$${ticketPromedio.toFixed(2)}`
-            } else {
-                document.getElementById('ventasTotales').textContent = '$0'
-                document.getElementById('totalPedidos').textContent = '0'
-                document.getElementById('ticketPromedio').textContent = '$0'
+                document.getElementById('ticketPromedio').textContent = `$${(total / pedidos.length).toFixed(0)}`
             }
         }
         
         async function cargarProductos() {
-            const { data: productos, error } = await supabase
-                .from('productos')
-                .select('*, categorias(nombre)')
-                .order('nombre')
-            
+            const { data } = await supabase.from('productos').select('*, categorias(nombre)').order('nombre')
             const tbody = document.getElementById('productosBody')
             
-            if (error || !productos) {
-                tbody.innerHTML = '<tr><td colspan="4">Error al cargar productos</td></tr>'
+            if (!data) {
+                tbody.innerHTML = '<tr><td colspan="4">No hay productos</td></tr>'
                 return
             }
             
-            tbody.innerHTML = productos.map(p => `
+            tbody.innerHTML = data.map(p => `
                 <tr>
                     <td>${p.nombre}</td>
-                    <td>${p.categorias?.nombre || 'Sin categoría'}</td>
+                    <td>${p.categorias?.nombre || 'General'}</td>
                     <td>$${Number(p.precio).toFixed(2)}</td>
-                    <td><span class="badge" style="background:${p.disponible ? '#27ae60' : '#c0392b'}">
-                        ${p.disponible ? 'Disponible' : 'Agotado'}
-                    </span></td>
+                    <td><span class="badge ${p.disponible ? 'badge-success' : 'badge-warning'}">${p.disponible ? 'Disponible' : 'Agotado'}</span></td>
                 </tr>
             `).join('')
         }
         
         async function cargarClientes() {
-            const { data: clientes } = await supabase
-                .from('clientes')
-                .select('*')
-                .order('puntos_fidelidad', { ascending: false })
-                .limit(10)
-            
+            const { data } = await supabase.from('clientes').select('*').order('puntos_fidelidad', { ascending: false }).limit(10)
             const tbody = document.getElementById('clientesBody')
             
-            if (!clientes || clientes.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4">No hay clientes registrados</td></tr>'
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4">Sin clientes registrados</td></tr>'
                 return
             }
             
-            tbody.innerHTML = clientes.map(c => `
+            tbody.innerHTML = data.map(c => `
                 <tr>
-                    <td><strong>${c.nombre}</strong></td>
-                    <td>${c.email || 'N/A'}</td>
-                    <td>${c.puntos_fidelidad} pts</td>
+                    <td>${c.nombre}</td>
+                    <td>${c.email || c.telefono || '—'}</td>
+                    <td>${c.puntos_fidelidad}</td>
                     <td>${new Date(c.fecha_registro).toLocaleDateString('es')}</td>
                 </tr>
             `).join('')
         }
         
-        async function cargarGraficas() {
-            const { data: productos } = await supabase
-                .from('productos')
-                .select('nombre')
-                .limit(5)
-            
-            // Gráfica de productos (simulada - en producción usarías datos reales de ventas)
+        function cargarGraficas() {
             new Chart(document.getElementById('productosChart'), {
                 type: 'doughnut',
                 data: {
-                    labels: productos?.map(p => p.nombre) || ['Café', 'Té', 'Postre', 'Sándwich', 'Bebida'],
+                    labels: ['Café', 'Té', 'Postres', 'Sándwiches', 'Bebidas frías'],
                     datasets: [{
-                        data: [35, 25, 20, 12, 8],
-                        backgroundColor: ['#8b5e3c', '#a0704a', '#b8855a', '#c99a6a', '#d4a373']
+                        data: [42, 18, 22, 10, 8],
+                        backgroundColor: ['#7C9082', '#9CAF88', '#C4A484', '#D4C5B5', '#B5C4A2'],
+                        borderWidth: 0
                     }]
-                }
+                },
+                options: { cutout: '65%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 15 } } } }
             })
             
-            // Gráfica de ventas por día
-            const dias = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
             new Chart(document.getElementById('ventasChart'), {
-                type: 'bar',
+                type: 'line',
                 data: {
-                    labels: dias,
+                    labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
                     datasets: [{
-                        label: 'Ventas ($)',
-                        data: [1250, 980, 1450, 1680, 2100, 1850, 950],
-                        backgroundColor: '#8b5e3c'
+                        label: 'Ventas',
+                        data: [1240, 890, 1520, 1780, 2350, 1980, 1120],
+                        borderColor: '#7C9082',
+                        backgroundColor: 'rgba(124, 144, 130, 0.05)',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#7C9082',
+                        pointRadius: 3,
+                        tension: 0.3,
+                        fill: true
                     }]
-                }
+                },
+                options: { plugins: { legend: { display: false } } }
             })
         }
         
-        // Iniciar carga
-        cargarReportes()
+        cargarTodo()
     </script>
 </body>
 </html>
