@@ -24,7 +24,6 @@
             margin: 0 auto;
         }
 
-        /* Navegación */
         .nav {
             display: flex;
             gap: 32px;
@@ -61,14 +60,12 @@
             margin-bottom: 24px;
         }
 
-        /* Layout de 2 columnas */
         .pos-layout {
             display: grid;
             grid-template-columns: 1fr 380px;
             gap: 24px;
         }
 
-        /* Panel izquierdo - Productos */
         .productos-panel {
             background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(8px);
@@ -147,7 +144,6 @@
             color: #5C7A67;
         }
 
-        /* Panel derecho - Pedido actual */
         .pedido-panel {
             background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(8px);
@@ -373,7 +369,6 @@
 </head>
 <body>
     <div class="container">
-        <!-- Navegación -->
         <div class="nav">
             <a href="/">Inicio</a>
             <a href="/reportes.html">Reportes</a>
@@ -384,7 +379,6 @@
         <h1>Nuevo pedido</h1>
         
         <div class="pos-layout">
-            <!-- Panel izquierdo - Productos -->
             <div class="productos-panel">
                 <div class="panel-title">Menú</div>
                 <div class="categorias-filter" id="categoriasFilter">
@@ -393,17 +387,14 @@
                 <div class="productos-grid" id="productosGrid"></div>
             </div>
             
-            <!-- Panel derecho - Pedido -->
             <div class="pedido-panel">
                 <div id="mensajePedido"></div>
                 
-                <!-- Selección de mesa -->
                 <div class="mesa-selector">
                     <label>Mesa</label>
                     <div class="mesa-grid-mini" id="mesasGrid"></div>
                 </div>
                 
-                <!-- Cliente -->
                 <div class="cliente-section">
                     <div class="flex-between">
                         <label>Cliente</label>
@@ -414,12 +405,10 @@
                     </select>
                 </div>
                 
-                <!-- Carrito -->
                 <div class="carrito-items" id="carritoItems">
                     <p style="color:#7C9082; text-align:center; padding:20px;">Agrega productos</p>
                 </div>
                 
-                <!-- Total -->
                 <div class="total-section">
                     <div class="total-row">
                         <span>Subtotal</span>
@@ -431,7 +420,6 @@
                     </div>
                 </div>
                 
-                <!-- Método de pago -->
                 <div class="metodo-pago">
                     <label>Método de pago</label>
                     <div class="pago-opciones">
@@ -441,10 +429,8 @@
                     </div>
                 </div>
                 
-                <!-- Botón finalizar -->
                 <button class="btn" onclick="finalizarPedido()">Finalizar pedido</button>
                 
-                <!-- Pedidos activos -->
                 <div style="margin-top:24px; padding-top:20px; border-top:1px solid rgba(156,175,136,0.15);">
                     <div class="flex-between mb-3">
                         <span style="font-weight:500; color:#3E5C4B;">Pedidos activos</span>
@@ -455,7 +441,6 @@
             </div>
         </div>
         
-        <!-- Modal nuevo cliente -->
         <div id="modalCliente" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.3); backdrop-filter:blur(4px); align-items:center; justify-content:center;">
             <div style="background:white; padding:28px; border-radius:24px; width:400px;">
                 <h3 style="margin-bottom:20px; color:#3E5C4B;">Nuevo cliente</h3>
@@ -488,7 +473,6 @@
         import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
         const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
         
-        // Estado del pedido
         let pedidoActual = {
             mesa_id: null,
             cliente_id: null,
@@ -500,16 +484,12 @@
         let categoriasData = []
         let categoriaActual = null
         
-        // Verificar sesión
         const { data: { session } } = await supabase.auth.getSession()
         if (!session) {
             alert('Debes iniciar sesión')
             window.location.href = '/'
         }
         
-        // =============================================
-        // INICIALIZACIÓN
-        // =============================================
         async function inicializar() {
             await cargarCategorias()
             await cargarProductos()
@@ -518,9 +498,6 @@
             await cargarPedidosActivos()
         }
         
-        // =============================================
-        // CATEGORÍAS Y PRODUCTOS
-        // =============================================
         async function cargarCategorias() {
             const { data } = await supabase.from('categorias').select('*').order('nombre')
             categoriasData = data || []
@@ -540,10 +517,7 @@
         
         window.filtrarPorCategoria = function(categoriaId) {
             categoriaActual = categoriaId
-            document.querySelectorAll('.cat-btn').forEach((btn, i) => {
-                btn.classList.remove('active')
-                if (i === 0 && categoriaId === null) btn.classList.add('active')
-            })
+            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'))
             renderizarProductos()
         }
         
@@ -566,9 +540,6 @@
             `).join('')
         }
         
-        // =============================================
-        // MESAS
-        // =============================================
         async function cargarMesas() {
             const { data } = await supabase.from('mesas').select('*').order('numero')
             const grid = document.getElementById('mesasGrid')
@@ -594,9 +565,6 @@
             pedidoActual.mesa_id = mesaId
         }
         
-        // =============================================
-        // CLIENTES
-        // =============================================
         async function cargarClientes() {
             const { data } = await supabase.from('clientes').select('*').order('nombre')
             const select = document.getElementById('clienteSelect')
@@ -643,9 +611,6 @@
             }
         }
         
-        // =============================================
-        // CARRITO
-        // =============================================
         window.agregarAlCarrito = function(productoId) {
             const producto = productosData.find(p => p.id === productoId)
             if (!producto) return
@@ -710,9 +675,6 @@
             document.getElementById('total').textContent = `$${subtotal.toFixed(2)}`
         }
         
-        // =============================================
-        // PAGO
-        // =============================================
         window.seleccionarPago = function(metodo) {
             pedidoActual.metodo_pago = metodo
             document.querySelectorAll('.pago-btn').forEach(btn => {
@@ -721,9 +683,6 @@
             })
         }
         
-        // =============================================
-        // FINALIZAR PEDIDO
-        // =============================================
         window.finalizarPedido = async function() {
             const mensaje = document.getElementById('mensajePedido')
             
@@ -739,7 +698,6 @@
             
             const total = pedidoActual.items.reduce((sum, i) => sum + (i.precio_unitario * i.cantidad), 0)
             
-            // Obtener empleado actual
             const { data: empleado } = await supabase.from('empleados').select('id').eq('user_id', session.user.id).single()
             
             if (!empleado) {
@@ -747,7 +705,6 @@
                 return
             }
             
-            // Crear pedido
             const { data: pedido, error: errorPedido } = await supabase
                 .from('pedidos')
                 .insert({
@@ -766,7 +723,6 @@
             
             const pedidoId = pedido[0].id
             
-            // Crear items
             const items = pedidoActual.items.map(i => ({
                 pedido_id: pedidoId,
                 producto_id: i.producto_id,
@@ -781,7 +737,6 @@
                 return
             }
             
-            // Crear transacción
             await supabase.from('transacciones').insert({
                 pedido_id: pedidoId,
                 monto: total,
@@ -789,18 +744,18 @@
                 estado: 'Completado'
             })
             
-            // Actualizar estado de mesa
             await supabase.from('mesas').update({ estado: 'Ocupada' }).eq('id', pedidoActual.mesa_id)
             
-            // Sumar puntos al cliente
             if (pedidoActual.cliente_id) {
-                const puntos = Math.floor(total / 10)
-                await supabase.rpc('increment', { row_id: pedidoActual.cliente_id })
+                const { data: cliente } = await supabase.from('clientes').select('puntos_fidelidad').eq('id', pedidoActual.cliente_id).single()
+                if (cliente) {
+                    const puntosGanados = Math.floor(total / 10)
+                    await supabase.from('clientes').update({ puntos_fidelidad: cliente.puntos_fidelidad + puntosGanados }).eq('id', pedidoActual.cliente_id)
+                }
             }
             
             mensaje.innerHTML = '<div class="msg-success">Pedido registrado</div>'
             
-            // Resetear
             pedidoActual = { mesa_id: null, cliente_id: null, items: [], metodo_pago: 'Efectivo' }
             renderizarCarrito()
             document.querySelectorAll('.mesa-btn').forEach(btn => btn.classList.remove('active'))
@@ -810,9 +765,6 @@
             await cargarPedidosActivos()
         }
         
-        // =============================================
-        // PEDIDOS ACTIVOS
-        // =============================================
         async function cargarPedidosActivos() {
             const { data } = await supabase
                 .from('pedidos')
@@ -839,7 +791,6 @@
             `).join('')
         }
         
-        // Exponer funciones
         window.filtrarPorCategoria = filtrarPorCategoria
         window.seleccionarMesa = seleccionarMesa
         window.clienteSeleccionado = clienteSeleccionado
