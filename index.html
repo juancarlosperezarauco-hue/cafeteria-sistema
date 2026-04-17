@@ -3,36 +3,257 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>☕ Cafetería</title>
+    <title>Cafetería · Sistema</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background: #f5f0eb; }
-        .nav { margin-bottom: 20px; padding: 10px; background: #8b5e3c; border-radius: 10px; }
-        .nav a { color: white; text-decoration: none; margin-right: 20px; font-weight: bold; }
-        button { padding: 10px 20px; margin: 5px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        button:hover { background: #45a049; }
-        #resultado { margin-top: 20px; padding: 15px; background: white; border-radius: 10px; }
-        .success { color: green; }
-        .error { color: red; }
-        .info { color: blue; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #F5F0E8;
+            min-height: 100vh;
+            padding: 24px;
+            color: #3A3A3A;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 28px;
+            padding: 36px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        /* Navegación */
+        .nav {
+            display: flex;
+            gap: 32px;
+            padding-bottom: 20px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid rgba(156, 175, 136, 0.2);
+        }
+
+        .nav a {
+            color: #5C7A67;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 450;
+            letter-spacing: -0.01em;
+            transition: all 0.2s ease;
+            padding-bottom: 4px;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav a:hover {
+            color: #3E5C4B;
+            border-bottom-color: #9CAF88;
+        }
+
+        /* Encabezado */
+        h1 {
+            font-size: 32px;
+            font-weight: 450;
+            letter-spacing: -0.02em;
+            color: #3E5C4B;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #7C9082;
+            font-size: 15px;
+            font-weight: 400;
+            margin-bottom: 32px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(156, 175, 136, 0.15);
+        }
+
+        /* Botones */
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 32px;
+        }
+
+        .btn {
+            background: transparent;
+            color: #5C7A67;
+            border: 1.5px solid #9CAF88;
+            padding: 12px 22px;
+            border-radius: 40px;
+            font-size: 14px;
+            font-weight: 450;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            letter-spacing: -0.01em;
+            backdrop-filter: blur(4px);
+        }
+
+        .btn:hover {
+            background: #9CAF88;
+            color: white;
+            border-color: #9CAF88;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(124, 144, 130, 0.15);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #C4A484;
+            border-color: #D4C5B5;
+        }
+
+        .btn-outline:hover {
+            background: #D4C5B5;
+            color: #5C7A67;
+            border-color: #D4C5B5;
+        }
+
+        /* Área de resultado */
+        .result-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 20px;
+            padding: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
+        }
+
+        /* Estados */
+        .msg-success {
+            color: #5C7A67;
+            background: rgba(156, 175, 136, 0.12);
+            padding: 16px 20px;
+            border-radius: 16px;
+            border-left: 3px solid #9CAF88;
+        }
+
+        .msg-error {
+            color: #C46B6B;
+            background: rgba(196, 107, 107, 0.06);
+            padding: 16px 20px;
+            border-radius: 16px;
+            border-left: 3px solid #C46B6B;
+        }
+
+        .msg-info {
+            color: #7C9082;
+            background: rgba(156, 175, 136, 0.06);
+            padding: 16px 20px;
+            border-radius: 16px;
+            border-left: 3px solid #9CAF88;
+        }
+
+        .msg-warning {
+            color: #C4A484;
+            background: rgba(196, 164, 132, 0.06);
+            padding: 16px 20px;
+            border-radius: 16px;
+            border-left: 3px solid #C4A484;
+        }
+
+        /* Lista de productos */
+        .product-list {
+            margin-top: 16px;
+        }
+
+        .category-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #5C7A67;
+            margin: 20px 0 12px 0;
+            letter-spacing: -0.01em;
+        }
+
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(156, 175, 136, 0.1);
+        }
+
+        .product-item:last-child {
+            border-bottom: none;
+        }
+
+        .product-name {
+            color: #3A3A3A;
+            font-weight: 400;
+        }
+
+        .product-price {
+            color: #5C7A67;
+            font-weight: 500;
+            background: rgba(156, 175, 136, 0.1);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        /* Credenciales */
+        .creds {
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+            background: rgba(156, 175, 136, 0.06);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        h3 {
+            font-size: 18px;
+            font-weight: 450;
+            color: #3E5C4B;
+            margin-bottom: 12px;
+            letter-spacing: -0.01em;
+        }
+
+        p {
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        strong {
+            font-weight: 500;
+            color: #3E5C4B;
+        }
     </style>
 </head>
 <body>
-    <div class="nav">
-        <a href="/">🏠 Inicio</a>
-        <a href="/reportes.html">📊 Reportes</a>
-    </div>
-    
-    <h1>☕ Cafetería Artesanal</h1>
-    
-    <div>
-        <button onclick="probarLogin()">🔐 Login Admin</button>
-        <button onclick="verProductos()">📋 Ver Menú</button>
-        <button onclick="verificarSesion()">👤 Verificar Sesión</button>
-        <button onclick="logout()" style="background:#c0392b">🚪 Cerrar Sesión</button>
-    </div>
-    
-    <div id="resultado">
-        <p class="info">Bienvenido. Usa: admin@cafeteria.com / Admin123!</p>
+    <div class="container">
+        <!-- Navegación minimalista -->
+        <div class="nav">
+            <a href="/">Inicio</a>
+            <a href="/reportes.html">Reportes</a>
+        </div>
+        
+        <h1>Cafetería</h1>
+        <div class="subtitle">Sistema de gestión</div>
+        
+        <!-- Botones de acción -->
+        <div class="btn-group">
+            <button class="btn" onclick="probarLogin()">Iniciar sesión</button>
+            <button class="btn" onclick="verProductos()">Ver menú</button>
+            <button class="btn" onclick="verificarSesion()">Estado</button>
+            <button class="btn btn-outline" onclick="logout()">Cerrar sesión</button>
+        </div>
+        
+        <!-- Resultados -->
+        <div id="resultado" class="result-card">
+            <div class="msg-info">
+                <p style="margin-bottom: 6px;"><strong>Acceso de prueba</strong></p>
+                <p>Correo: <span class="creds">admin@cafeteria.com</span><br>
+                Contraseña: <span class="creds">Admin123!</span></p>
+            </div>
+        </div>
     </div>
 
     <script type="module">
@@ -44,48 +265,97 @@
         
         window.probarLogin = async function() {
             const div = document.getElementById('resultado')
-            div.innerHTML = 'Cargando...'
+            div.innerHTML = '<div class="msg-info">Verificando credenciales...</div>'
+            
             const { data, error } = await supabase.auth.signInWithPassword({
                 email: 'admin@cafeteria.com',
                 password: 'Admin123!'
             })
+            
             if (error) {
-                div.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`
+                div.innerHTML = `<div class="msg-error">
+                    <strong>Error de acceso</strong><br>${error.message}
+                </div>`
             } else {
-                div.innerHTML = `<p class="success">✅ Login exitoso! ${data.user.email}</p>`
+                div.innerHTML = `<div class="msg-success">
+                    <strong>Sesión iniciada</strong><br>
+                    ${data.user.email} · ${new Date(data.user.last_sign_in_at).toLocaleString('es')}
+                </div>`
             }
         }
         
         window.verProductos = async function() {
             const div = document.getElementById('resultado')
             const { data: { session } } = await supabase.auth.getSession()
+            
             if (!session) {
-                div.innerHTML = '<p class="error">❌ Inicia sesión primero</p>'
+                div.innerHTML = '<div class="msg-warning">Inicia sesión para ver el menú</div>'
                 return
             }
-            const { data, error } = await supabase.from('productos').select('*').limit(10)
+            
+            div.innerHTML = '<div class="msg-info">Cargando menú...</div>'
+            
+            const { data: productos, error } = await supabase
+                .from('productos')
+                .select('*, categorias(nombre)')
+                .eq('disponible', true)
+                .order('nombre')
+            
             if (error) {
-                div.innerHTML = `<p class="error">Error: ${error.message}</p>`
-            } else {
-                let html = '<h3>Menú:</h3>'
-                data.forEach(p => html += `<p>• ${p.nombre} - $${p.precio}</p>`)
-                div.innerHTML = `<div class="success">${html}</div>`
+                div.innerHTML = `<div class="msg-error">Error: ${error.message}</div>`
+                return
             }
+            
+            if (!productos || productos.length === 0) {
+                div.innerHTML = '<div class="msg-info">No hay productos disponibles</div>'
+                return
+            }
+            
+            let html = '<h3>Menú</h3><div class="product-list">'
+            let categoriaActual = ''
+            
+            productos.forEach(p => {
+                const catNombre = p.categorias?.nombre || 'General'
+                if (catNombre !== categoriaActual) {
+                    categoriaActual = catNombre
+                    html += `<div class="category-title">${catNombre}</div>`
+                }
+                html += `<div class="product-item">
+                    <span class="product-name">${p.nombre}</span>
+                    <span class="product-price">$${Number(p.precio).toFixed(2)}</span>
+                </div>`
+            })
+            
+            html += '</div>'
+            div.innerHTML = `<div class="msg-success">${html}</div>`
         }
         
         window.verificarSesion = async function() {
             const div = document.getElementById('resultado')
             const { data: { session } } = await supabase.auth.getSession()
+            
             if (session) {
-                div.innerHTML = `<p class="success">✅ Sesión activa: ${session.user.email}</p>`
+                div.innerHTML = `<div class="msg-success">
+                    <strong>Sesión activa</strong><br>
+                    ${session.user.email}<br>
+                    <span style="font-size:13px; opacity:0.7;">Expira: ${new Date(session.expires_at * 1000).toLocaleString('es')}</span>
+                </div>`
             } else {
-                div.innerHTML = '<p class="info">ℹ️ No hay sesión activa</p>'
+                div.innerHTML = '<div class="msg-info">No hay sesión activa</div>'
             }
         }
         
         window.logout = async function() {
             await supabase.auth.signOut()
-            document.getElementById('resultado').innerHTML = '<p class="success">👋 Sesión cerrada</p>'
+            document.getElementById('resultado').innerHTML = '<div class="msg-success">Sesión cerrada</div>'
+        }
+        
+        // Verificar sesión al cargar
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session) {
+            document.getElementById('resultado').innerHTML = `<div class="msg-success">
+                <strong>Sesión activa</strong><br>${session.user.email}
+            </div>`
         }
     </script>
 </body>
