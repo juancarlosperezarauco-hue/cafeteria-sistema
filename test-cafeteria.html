@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Test Simple Cafetería</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        button { 
+            padding: 15px; 
+            margin: 10px; 
+            font-size: 16px; 
+            cursor: pointer;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        #resultado {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>☕ Test de Conexión - Cafetería</h1>
+    
+    <button onclick="probarLogin()">1️⃣ Probar Login</button>
+    <button onclick="verProductos()">2️⃣ Ver Productos</button>
+    <button onclick="verificarSesion()">3️⃣ Verificar Sesión</button>
+    
+    <div id="resultado">Esperando acción...</div>
+
+    <script type="module">
+        // ⚠️ ¡CAMBIAR ESTOS DOS VALORES! ⚠️
+       const SUPABASE_URL = 'https://knciklpjeboeznbvajil.supabase.co'
+        const SUPABASE_KEY = 'sb_publishable_8xwi4BOCYmqXx-VqdXuZwA_cmd5CeNj'
+        
+        import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+        const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+        
+        window.probarLogin = async function() {
+            const div = document.getElementById('resultado')
+            div.innerHTML = '⏳ Intentando login...'
+            
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: 'admin@cafeteria.com',
+                password: 'Admin123!'
+            })
+            
+            if (error) {
+                div.innerHTML = `<p style="color:red">❌ ERROR: ${error.message}</p>`
+            } else {
+                div.innerHTML = `<p style="color:green">✅ LOGIN EXITOSO!<br>Usuario: ${data.user.email}</p>`
+            }
+        }
+        
+        window.verProductos = async function() {
+            const div = document.getElementById('resultado')
+            const { data: { session } } = await supabase.auth.getSession()
+            
+            if (!session) {
+                div.innerHTML = '<p style="color:orange">⚠️ Primero haz login</p>'
+                return
+            }
+            
+            const { data, error } = await supabase.from('productos').select('*').limit(5)
+            
+            if (error) {
+                div.innerHTML = `<p style="color:red">❌ Error: ${error.message}</p>`
+            } else {
+                div.innerHTML = `<p style="color:green">✅ ${data.length} productos encontrados:<br>` +
+                    data.map(p => `• ${p.nombre} - $${p.precio}`).join('<br>') + '</p>'
+            }
+        }
+        
+        window.verificarSesion = async function() {
+            const div = document.getElementById('resultado')
+            const { data: { session } } = await supabase.auth.getSession()
+            
+            if (session) {
+                div.innerHTML = `<p style="color:green">✅ Sesión activa: ${session.user.email}</p>`
+            } else {
+                div.innerHTML = '<p style="color:blue">ℹ️ No hay sesión activa</p>'
+            }
+        }
+    </script>
+</body>
+</html>
