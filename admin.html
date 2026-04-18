@@ -5,619 +5,148 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Administración · Cafetería</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #F5F0E8;
-            min-height: 100vh;
-            padding: 24px;
-            color: #3A3A3A;
-        }
-
-        .container {
-            max-width: 1300px;
-            margin: 0 auto;
-        }
-
-        /* Navegación */
-        .nav {
-            display: flex;
-            gap: 32px;
-            padding-bottom: 20px;
-            margin-bottom: 24px;
-            border-bottom: 1px solid rgba(156, 175, 136, 0.2);
-        }
-
-        .nav a {
-            color: #5C7A67;
-            text-decoration: none;
-            font-size: 15px;
-            font-weight: 450;
-            transition: all 0.2s;
-            padding-bottom: 4px;
-            border-bottom: 2px solid transparent;
-        }
-
-        .nav a:hover {
-            color: #3E5C4B;
-            border-bottom-color: #9CAF88;
-        }
-
-        .nav a.active {
-            color: #3E5C4B;
-            border-bottom-color: #9CAF88;
-        }
-
-        h1 {
-            font-size: 32px;
-            font-weight: 450;
-            letter-spacing: -0.02em;
-            color: #3E5C4B;
-            margin-bottom: 8px;
-        }
-
-        .subtitle {
-            color: #7C9082;
-            font-size: 15px;
-            margin-bottom: 32px;
-        }
-
-        /* Pestañas */
-        .tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 28px;
-            border-bottom: 1px solid rgba(156, 175, 136, 0.15);
-            padding-bottom: 12px;
-        }
-
-        .tab {
-            background: transparent;
-            border: none;
-            padding: 10px 20px;
-            font-size: 14px;
-            font-weight: 450;
-            color: #7C9082;
-            cursor: pointer;
-            border-radius: 30px;
-            transition: all 0.2s;
-        }
-
-        .tab:hover {
-            background: rgba(156, 175, 136, 0.1);
-            color: #5C7A67;
-        }
-
-        .tab.active {
-            background: #9CAF88;
-            color: white;
-        }
-
-        /* Paneles */
-        .panel {
-            display: none;
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(8px);
-            padding: 28px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.6);
-        }
-
-        .panel.active {
-            display: block;
-        }
-
-        .panel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        .panel-title {
-            font-size: 18px;
-            font-weight: 500;
-            color: #3E5C4B;
-        }
-
-        /* Botones */
-        .btn {
-            background: #9CAF88;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 30px;
-            font-size: 14px;
-            font-weight: 450;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn:hover {
-            background: #7C9082;
-            transform: translateY(-1px);
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: #5C7A67;
-            border: 1.5px solid #9CAF88;
-        }
-
-        .btn-outline:hover {
-            background: #9CAF88;
-            color: white;
-        }
-
-        .btn-small {
-            padding: 6px 14px;
-            font-size: 13px;
-        }
-
-        .btn-danger {
-            background: transparent;
-            color: #C46B6B;
-            border: 1.5px solid #D4C5B5;
-        }
-
-        .btn-danger:hover {
-            background: #C46B6B;
-            color: white;
-            border-color: #C46B6B;
-        }
-
-        /* Tablas */
-        .table-wrapper {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th {
-            text-align: left;
-            padding: 14px 0;
-            font-weight: 450;
-            color: #7C9082;
-            font-size: 13px;
-            border-bottom: 1px solid rgba(156, 175, 136, 0.2);
-        }
-
-        td {
-            padding: 14px 0;
-            border-bottom: 1px solid rgba(156, 175, 136, 0.1);
-            color: #3A3A3A;
-        }
-
-        .badge {
-            background: rgba(156, 175, 136, 0.15);
-            color: #5C7A67;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-        }
-
-        .badge-success {
-            background: rgba(92, 122, 103, 0.12);
-            color: #3E5C4B;
-        }
-
-        .badge-warning {
-            background: rgba(196, 164, 132, 0.12);
-            color: #9B7B5E;
-        }
-
-        .badge-error {
-            background: rgba(196, 107, 107, 0.1);
-            color: #C46B6B;
-        }
-
-        /* Formulario */
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            font-size: 13px;
-            font-weight: 450;
-            color: #5C7A67;
-            margin-bottom: 6px;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 12px 16px;
-            background: white;
-            border: 1.5px solid rgba(156, 175, 136, 0.2);
-            border-radius: 14px;
-            font-size: 14px;
-            color: #3A3A3A;
-            transition: border 0.2s;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: #9CAF88;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .checkbox-group input {
-            width: auto;
-        }
-
-        .actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .modal {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 28px;
-            border-radius: 24px;
-            margin-bottom: 24px;
-            border: 1px solid rgba(156, 175, 136, 0.2);
-        }
-
-        .modal-title {
-            font-size: 18px;
-            font-weight: 500;
-            color: #3E5C4B;
-            margin-bottom: 24px;
-        }
-
-        .mesa-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 12px;
-        }
-
-        .mesa-card {
-            background: white;
-            padding: 16px;
-            border-radius: 14px;
-            text-align: center;
-            border: 1.5px solid rgba(156, 175, 136, 0.2);
-        }
-
-        .mesa-numero {
-            font-size: 20px;
-            font-weight: 500;
-            color: #3E5C4B;
-        }
-
-        .mesa-capacidad {
-            font-size: 13px;
-            color: #7C9082;
-        }
-
-        .mesa-disponible {
-            border-color: #9CAF88;
-            background: rgba(156, 175, 136, 0.05);
-        }
-
-        .mesa-ocupada {
-            border-color: #C4A484;
-            background: rgba(196, 164, 132, 0.05);
-        }
-
-        .mesa-reservada {
-            border-color: #C46B6B;
-            background: rgba(196, 107, 107, 0.03);
-        }
-
-        .msg-success {
-            color: #5C7A67;
-            background: rgba(156, 175, 136, 0.12);
-            padding: 12px 16px;
-            border-radius: 14px;
-            margin-bottom: 20px;
-        }
-
-        .msg-error {
-            color: #C46B6B;
-            background: rgba(196, 107, 107, 0.06);
-            padding: 12px 16px;
-            border-radius: 14px;
-            margin-bottom: 20px;
-        }
-
-        .flex-between {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .gap-2 { gap: 8px; }
-        .mt-4 { margin-top: 20px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: #F5F0E8; min-height: 100vh; padding: 24px; color: #3A3A3A; }
+        .container { max-width: 1300px; margin: 0 auto; }
+        .nav { display: flex; gap: 32px; padding-bottom: 20px; margin-bottom: 24px; border-bottom: 1px solid rgba(156, 175, 136, 0.2); }
+        .nav a { color: #5C7A67; text-decoration: none; font-size: 15px; font-weight: 450; padding-bottom: 4px; border-bottom: 2px solid transparent; }
+        .nav a:hover { color: #3E5C4B; border-bottom-color: #9CAF88; }
+        .nav a.active { color: #3E5C4B; border-bottom-color: #9CAF88; }
+        h1 { font-size: 32px; font-weight: 450; color: #3E5C4B; margin-bottom: 8px; }
+        .subtitle { color: #7C9082; font-size: 15px; margin-bottom: 32px; }
+        .tabs { display: flex; gap: 8px; margin-bottom: 28px; border-bottom: 1px solid rgba(156, 175, 136, 0.15); padding-bottom: 12px; }
+        .tab { background: transparent; border: none; padding: 10px 20px; font-size: 14px; font-weight: 450; color: #7C9082; cursor: pointer; border-radius: 30px; }
+        .tab:hover { background: rgba(156, 175, 136, 0.1); color: #5C7A67; }
+        .tab.active { background: #9CAF88; color: white; }
+        .panel { display: none; background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(8px); padding: 28px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.6); }
+        .panel.active { display: block; }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .panel-title { font-size: 18px; font-weight: 500; color: #3E5C4B; }
+        .btn { background: #9CAF88; color: white; border: none; padding: 10px 20px; border-radius: 30px; font-size: 14px; font-weight: 450; cursor: pointer; }
+        .btn:hover { background: #7C9082; }
+        .btn-outline { background: transparent; color: #5C7A67; border: 1.5px solid #9CAF88; }
+        .btn-outline:hover { background: #9CAF88; color: white; }
+        .btn-small { padding: 6px 14px; font-size: 13px; }
+        .btn-danger { background: transparent; color: #C46B6B; border: 1.5px solid #D4C5B5; }
+        .btn-danger:hover { background: #C46B6B; color: white; border-color: #C46B6B; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 14px 0; font-weight: 450; color: #7C9082; font-size: 13px; border-bottom: 1px solid rgba(156, 175, 136, 0.2); }
+        td { padding: 14px 0; border-bottom: 1px solid rgba(156, 175, 136, 0.1); color: #3A3A3A; }
+        .badge { background: rgba(156, 175, 136, 0.15); color: #5C7A67; padding: 4px 10px; border-radius: 20px; font-size: 12px; }
+        .badge-success { background: rgba(92, 122, 103, 0.12); color: #3E5C4B; }
+        .badge-error { background: rgba(196, 107, 107, 0.1); color: #C46B6B; }
+        .modal { background: rgba(255, 255, 255, 0.95); padding: 28px; border-radius: 24px; margin-bottom: 24px; border: 1px solid rgba(156, 175, 136, 0.2); }
+        .modal-title { font-size: 18px; font-weight: 500; color: #3E5C4B; margin-bottom: 24px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-size: 13px; font-weight: 450; color: #5C7A67; margin-bottom: 6px; }
+        input, select { width: 100%; padding: 12px 16px; background: white; border: 1.5px solid rgba(156, 175, 136, 0.2); border-radius: 14px; font-size: 14px; }
+        input:focus, select:focus { outline: none; border-color: #9CAF88; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .checkbox-group { display: flex; align-items: center; gap: 10px; }
+        .checkbox-group input { width: auto; }
+        .actions { display: flex; gap: 8px; }
+        .mesa-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; }
+        .mesa-card { background: white; padding: 16px; border-radius: 14px; text-align: center; border: 1.5px solid rgba(156, 175, 136, 0.2); }
+        .mesa-numero { font-size: 20px; font-weight: 500; color: #3E5C4B; }
+        .mesa-capacidad { font-size: 13px; color: #7C9082; }
+        .mesa-disponible { border-color: #9CAF88; background: rgba(156, 175, 136, 0.05); }
+        .mesa-ocupada { border-color: #C4A484; background: rgba(196, 164, 132, 0.05); }
+        .msg-success { color: #5C7A67; background: rgba(156, 175, 136, 0.12); padding: 12px 16px; border-radius: 14px; margin-bottom: 20px; }
+        .msg-error { color: #C46B6B; background: rgba(196, 107, 107, 0.06); padding: 12px 16px; border-radius: 14px; margin-bottom: 20px; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Navegación -->
         <div class="nav">
             <a href="/">Inicio</a>
             <a href="/reportes.html">Reportes</a>
             <a href="/admin.html" class="active">Administración</a>
+            <a href="/pedidos.html">Pedidos</a>
         </div>
-        
         <h1>Administración</h1>
-        <div class="subtitle">Gestión de productos, empleados y mesas</div>
-        
-        <!-- Pestañas -->
+        <div class="subtitle">Gestión de productos, categorías y mesas</div>
         <div class="tabs">
             <button class="tab active" onclick="showPanel('productos')">Productos</button>
             <button class="tab" onclick="showPanel('categorias')">Categorías</button>
-            <button class="tab" onclick="showPanel('empleados')">Empleados</button>
             <button class="tab" onclick="showPanel('mesas')">Mesas</button>
         </div>
-        
-        <!-- Panel Productos -->
         <div id="panel-productos" class="panel active">
-            <div class="panel-header">
-                <div class="panel-title">Catálogo de productos</div>
-                <button class="btn" onclick="mostrarFormularioProducto()">+ Nuevo producto</button>
-            </div>
-            
+            <div class="panel-header"><div class="panel-title">Catálogo de productos</div><button class="btn" onclick="mostrarFormularioProducto()">+ Nuevo producto</button></div>
             <div id="mensajeProductos"></div>
-            
-            <!-- Formulario (oculto por defecto) -->
             <div id="formProducto" class="modal" style="display:none;">
                 <div class="modal-title" id="tituloFormProducto">Nuevo producto</div>
                 <form onsubmit="guardarProducto(event)">
                     <input type="hidden" id="productoId">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Nombre</label>
-                            <input type="text" id="productoNombre" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Precio</label>
-                            <input type="number" step="0.01" id="productoPrecio" required>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Descripción</label>
-                        <input type="text" id="productoDescripcion">
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Categoría</label>
-                            <select id="productoCategoria" required></select>
-                        </div>
-                        <div class="form-group checkbox-group">
-                            <input type="checkbox" id="productoDisponible" checked>
-                            <label style="margin:0;">Disponible</label>
-                        </div>
-                    </div>
-                    <div class="actions">
-                        <button type="submit" class="btn">Guardar</button>
-                        <button type="button" class="btn-outline" onclick="cancelarFormProducto()">Cancelar</button>
-                    </div>
+                    <div class="form-row"><div class="form-group"><label>Nombre</label><input type="text" id="productoNombre" required></div><div class="form-group"><label>Precio</label><input type="number" step="0.01" id="productoPrecio" required></div></div>
+                    <div class="form-group"><label>Descripción</label><input type="text" id="productoDescripcion"></div>
+                    <div class="form-row"><div class="form-group"><label>Categoría</label><select id="productoCategoria" required></select></div><div class="form-group checkbox-group"><input type="checkbox" id="productoDisponible" checked><label style="margin:0;">Disponible</label></div></div>
+                    <div class="actions"><button type="submit" class="btn">Guardar</button><button type="button" class="btn-outline" onclick="cancelarFormProducto()">Cancelar</button></div>
                 </form>
             </div>
-            
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Producto</th>
-                            <th>Categoría</th>
-                            <th>Precio</th>
-                            <th>Estado</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody id="productosBody">
-                        <tr><td colspan="5">Cargando...</td></tr>
-                    </tbody>
-                </table>
-            </div>
+            <table><thead><tr><th>Producto</th><th>Categoría</th><th>Precio</th><th>Estado</th><th></th></tr></thead><tbody id="productosBody"><tr><td colspan="5">Cargando...</td></tr></tbody></table>
         </div>
-        
-        <!-- Panel Categorías -->
         <div id="panel-categorias" class="panel">
-            <div class="panel-header">
-                <div class="panel-title">Categorías</div>
-                <button class="btn" onclick="mostrarFormCategoria()">+ Nueva categoría</button>
-            </div>
-            
+            <div class="panel-header"><div class="panel-title">Categorías</div><button class="btn" onclick="mostrarFormCategoria()">+ Nueva categoría</button></div>
             <div id="formCategoria" class="modal" style="display:none;">
                 <div class="modal-title">Nueva categoría</div>
                 <form onsubmit="guardarCategoria(event)">
-                    <div class="form-group">
-                        <label>Nombre</label>
-                        <input type="text" id="categoriaNombre" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Descripción</label>
-                        <input type="text" id="categoriaDescripcion">
-                    </div>
-                    <div class="actions">
-                        <button type="submit" class="btn">Guardar</button>
-                        <button type="button" class="btn-outline" onclick="cancelarFormCategoria()">Cancelar</button>
-                    </div>
+                    <div class="form-group"><label>Nombre</label><input type="text" id="categoriaNombre" required></div>
+                    <div class="form-group"><label>Descripción</label><input type="text" id="categoriaDescripcion"></div>
+                    <div class="actions"><button type="submit" class="btn">Guardar</button><button type="button" class="btn-outline" onclick="cancelarFormCategoria()">Cancelar</button></div>
                 </form>
             </div>
-            
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Descripción</th>
-                            <th>Productos</th>
-                        </tr>
-                    </thead>
-                    <tbody id="categoriasBody">
-                        <tr><td colspan="3">Cargando...</td></tr>
-                    </tbody>
-                </table>
-            </div>
+            <table><thead><tr><th>Nombre</th><th>Descripción</th></tr></thead><tbody id="categoriasBody"><tr><td colspan="2">Cargando...</td></tr></tbody></table>
         </div>
-        
-        <!-- Panel Empleados -->
-        <div id="panel-empleados" class="panel">
-            <div class="panel-header">
-                <div class="panel-title">Personal</div>
-            </div>
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Rol</th>
-                            <th>Fecha contratación</th>
-                        </tr>
-                    </thead>
-                    <tbody id="empleadosBody">
-                        <tr><td colspan="3">Cargando...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-            <p style="margin-top:16px; font-size:13px; color:#7C9082;">Los empleados se gestionan desde Supabase Auth.</p>
-        </div>
-        
-        <!-- Panel Mesas -->
         <div id="panel-mesas" class="panel">
-            <div class="panel-header">
-                <div class="panel-title">Estado de mesas</div>
-                <button class="btn" onclick="mostrarFormMesa()">+ Nueva mesa</button>
-            </div>
-            
+            <div class="panel-header"><div class="panel-title">Estado de mesas</div><button class="btn" onclick="mostrarFormMesa()">+ Nueva mesa</button></div>
             <div id="formMesa" class="modal" style="display:none;">
                 <div class="modal-title">Nueva mesa</div>
                 <form onsubmit="guardarMesa(event)">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Número</label>
-                            <input type="text" id="mesaNumero" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Capacidad</label>
-                            <input type="number" id="mesaCapacidad" min="1" required>
-                        </div>
-                    </div>
-                    <div class="actions">
-                        <button type="submit" class="btn">Guardar</button>
-                        <button type="button" class="btn-outline" onclick="cancelarFormMesa()">Cancelar</button>
-                    </div>
+                    <div class="form-row"><div class="form-group"><label>Número</label><input type="text" id="mesaNumero" required></div><div class="form-group"><label>Capacidad</label><input type="number" id="mesaCapacidad" min="1" required></div></div>
+                    <div class="actions"><button type="submit" class="btn">Guardar</button><button type="button" class="btn-outline" onclick="cancelarFormMesa()">Cancelar</button></div>
                 </form>
             </div>
-            
             <div id="mensajeMesas"></div>
             <div class="mesa-grid" id="mesasGrid"></div>
         </div>
     </div>
-
     <script type="module">
         const SUPABASE_URL = 'https://knciklpjeboeznbvajil.supabase.co'
         const SUPABASE_KEY = 'sb_publishable_8xwi4BOCYmqXx-VqdXuZwA_cmd5CeNj'
-        
         import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
         const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
-        
-        // Verificar sesión al cargar
-        const { data: { session } } = await supabase.auth.getSession()
-        if (!session) {
-            alert('Debes iniciar sesión como administrador')
-            window.location.href = '/'
-        }
-        
-        // =============================================
-        // CAMBIO DE PESTAÑAS
-        // =============================================
-        window.showPanel = function(panelName) {
+        window.showPanel = function(name) {
             document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'))
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
-            document.getElementById(`panel-${panelName}`).classList.add('active')
+            document.getElementById(`panel-${name}`).classList.add('active')
             event.target.classList.add('active')
-            
-            if (panelName === 'productos') cargarProductos()
-            else if (panelName === 'categorias') cargarCategorias()
-            else if (panelName === 'empleados') cargarEmpleados()
-            else if (panelName === 'mesas') cargarMesas()
+            if (name === 'productos') cargarProductos()
+            else if (name === 'categorias') cargarCategorias()
+            else if (name === 'mesas') cargarMesas()
         }
-        
-        // =============================================
-        // GESTIÓN DE PRODUCTOS
-        // =============================================
         async function cargarProductos() {
             const { data } = await supabase.from('productos').select('*, categorias(nombre)').order('nombre')
             const tbody = document.getElementById('productosBody')
-            
-            if (!data) {
-                tbody.innerHTML = '<tr><td colspan="5">No hay productos</td></tr>'
-                return
-            }
-            
-            tbody.innerHTML = data.map(p => `
-                <tr>
-                    <td>
-                        <strong>${p.nombre}</strong><br>
-                        <span style="font-size:13px; color:#7C9082;">${p.descripcion || ''}</span>
-                    </td>
-                    <td>${p.categorias?.nombre || 'Sin categoría'}</td>
-                    <td>$${Number(p.precio).toFixed(2)}</td>
-                    <td>
-                        <span class="badge ${p.disponible ? 'badge-success' : 'badge-error'}">
-                            ${p.disponible ? 'Disponible' : 'Agotado'}
-                        </span>
-                    </td>
-                    <td>
-                        <div class="actions">
-                            <button class="btn-outline btn-small" onclick="editarProducto(${p.id})">Editar</button>
-                            <button class="btn-danger btn-small" onclick="eliminarProducto(${p.id})">Eliminar</button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('')
-            
+            if (!data) { tbody.innerHTML = '<tr><td colspan="5">No hay productos</td></tr>'; return }
+            tbody.innerHTML = data.map(p => `<tr><td><strong>${p.nombre}</strong><br><span style="font-size:13px; color:#7C9082;">${p.descripcion || ''}</span></td><td>${p.categorias?.nombre || 'Sin categoría'}</td><td>$${Number(p.precio).toFixed(2)}</td><td><span class="badge ${p.disponible ? 'badge-success' : 'badge-error'}">${p.disponible ? 'Disponible' : 'Agotado'}</span></td><td><div class="actions"><button class="btn-outline btn-small" onclick="editarProducto(${p.id})">Editar</button><button class="btn-danger btn-small" onclick="eliminarProducto(${p.id})">Eliminar</button></div></td></tr>`).join('')
             await cargarCategoriasSelect()
         }
-        
         async function cargarCategoriasSelect() {
             const { data } = await supabase.from('categorias').select('*').order('nombre')
             const select = document.getElementById('productoCategoria')
             select.innerHTML = data.map(c => `<option value="${c.id}">${c.nombre}</option>`).join('')
         }
-        
         window.mostrarFormularioProducto = function() {
             document.getElementById('formProducto').style.display = 'block'
             document.getElementById('tituloFormProducto').textContent = 'Nuevo producto'
-            document.getElementById('productoId').value = ''
-            document.getElementById('productoNombre').value = ''
-            document.getElementById('productoDescripcion').value = ''
-            document.getElementById('productoPrecio').value = ''
+            document.getElementById('productoId').value = document.getElementById('productoNombre').value = document.getElementById('productoDescripcion').value = document.getElementById('productoPrecio').value = ''
             document.getElementById('productoDisponible').checked = true
         }
-        
-        window.cancelarFormProducto = function() {
-            document.getElementById('formProducto').style.display = 'none'
-        }
-        
+        window.cancelarFormProducto = () => document.getElementById('formProducto').style.display = 'none'
         window.editarProducto = async function(id) {
             const { data } = await supabase.from('productos').select('*').eq('id', id).single()
             if (!data) return
-            
             document.getElementById('formProducto').style.display = 'block'
             document.getElementById('tituloFormProducto').textContent = 'Editar producto'
             document.getElementById('productoId').value = data.id
@@ -627,165 +156,39 @@
             document.getElementById('productoCategoria').value = data.categoria_id
             document.getElementById('productoDisponible').checked = data.disponible
         }
-        
-        window.guardarProducto = async function(event) {
-            event.preventDefault()
+        window.guardarProducto = async function(e) {
+            e.preventDefault()
             const id = document.getElementById('productoId').value
-            const producto = {
-                nombre: document.getElementById('productoNombre').value,
-                descripcion: document.getElementById('productoDescripcion').value,
-                precio: parseFloat(document.getElementById('productoPrecio').value),
-                categoria_id: parseInt(document.getElementById('productoCategoria').value),
-                disponible: document.getElementById('productoDisponible').checked
-            }
-            
-            let error
-            if (id) {
-                ({ error } = await supabase.from('productos').update(producto).eq('id', id))
-            } else {
-                ({ error } = await supabase.from('productos').insert(producto))
-            }
-            
-            if (error) {
-                document.getElementById('mensajeProductos').innerHTML = `<div class="msg-error">Error: ${error.message}</div>`
-            } else {
-                document.getElementById('formProducto').style.display = 'none'
-                cargarProductos()
-            }
+            const prod = { nombre: document.getElementById('productoNombre').value, descripcion: document.getElementById('productoDescripcion').value, precio: parseFloat(document.getElementById('productoPrecio').value), categoria_id: parseInt(document.getElementById('productoCategoria').value), disponible: document.getElementById('productoDisponible').checked }
+            const { error } = id ? await supabase.from('productos').update(prod).eq('id', id) : await supabase.from('productos').insert(prod)
+            if (error) { document.getElementById('mensajeProductos').innerHTML = `<div class="msg-error">Error: ${error.message}</div>` }
+            else { document.getElementById('formProducto').style.display = 'none'; cargarProductos() }
         }
-        
-        window.eliminarProducto = async function(id) {
-            if (!confirm('¿Eliminar este producto?')) return
-            await supabase.from('productos').delete().eq('id', id)
-            cargarProductos()
-        }
-        
-        // =============================================
-        // GESTIÓN DE CATEGORÍAS
-        // =============================================
+        window.eliminarProducto = async function(id) { if (confirm('¿Eliminar?')) { await supabase.from('productos').delete().eq('id', id); cargarProductos() } }
         async function cargarCategorias() {
             const { data } = await supabase.from('categorias').select('*').order('nombre')
-            const tbody = document.getElementById('categoriasBody')
-            
-            if (!data) {
-                tbody.innerHTML = '<tr><td colspan="3">No hay categorías</td></tr>'
-                return
-            }
-            
-            tbody.innerHTML = data.map(c => `
-                <tr>
-                    <td><strong>${c.nombre}</strong></td>
-                    <td>${c.descripcion || '—'}</td>
-                    <td><span class="badge">${c.id}</span></td>
-                </tr>
-            `).join('')
+            document.getElementById('categoriasBody').innerHTML = data?.length ? data.map(c => `<tr><td><strong>${c.nombre}</strong></td><td>${c.descripcion || '—'}</td></tr>`).join('') : '<tr><td colspan="2">No hay categorías</td></tr>'
         }
-        
-        window.mostrarFormCategoria = function() {
-            document.getElementById('formCategoria').style.display = 'block'
+        window.mostrarFormCategoria = () => document.getElementById('formCategoria').style.display = 'block'
+        window.cancelarFormCategoria = () => document.getElementById('formCategoria').style.display = 'none'
+        window.guardarCategoria = async function(e) {
+            e.preventDefault()
+            const { error } = await supabase.from('categorias').insert({ nombre: document.getElementById('categoriaNombre').value, descripcion: document.getElementById('categoriaDescripcion').value })
+            if (!error) { document.getElementById('formCategoria').style.display = 'none'; document.getElementById('categoriaNombre').value = document.getElementById('categoriaDescripcion').value = ''; cargarCategorias(); cargarCategoriasSelect() }
         }
-        
-        window.cancelarFormCategoria = function() {
-            document.getElementById('formCategoria').style.display = 'none'
-        }
-        
-        window.guardarCategoria = async function(event) {
-            event.preventDefault()
-            const categoria = {
-                nombre: document.getElementById('categoriaNombre').value,
-                descripcion: document.getElementById('categoriaDescripcion').value
-            }
-            
-            const { error } = await supabase.from('categorias').insert(categoria)
-            
-            if (error) {
-                alert('Error: ' + error.message)
-            } else {
-                document.getElementById('formCategoria').style.display = 'none'
-                document.getElementById('categoriaNombre').value = ''
-                document.getElementById('categoriaDescripcion').value = ''
-                cargarCategorias()
-                cargarCategoriasSelect()
-            }
-        }
-        
-        // =============================================
-        // GESTIÓN DE EMPLEADOS
-        // =============================================
-        async function cargarEmpleados() {
-            const { data } = await supabase.from('empleados').select('*').order('nombre')
-            const tbody = document.getElementById('empleadosBody')
-            
-            if (!data || data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3">No hay empleados registrados</td></tr>'
-                return
-            }
-            
-            tbody.innerHTML = data.map(e => `
-                <tr>
-                    <td><strong>${e.nombre} ${e.apellido}</strong></td>
-                    <td><span class="badge badge-success">${e.rol}</span></td>
-                    <td>${new Date(e.fecha_contratacion).toLocaleDateString('es')}</td>
-                </tr>
-            `).join('')
-        }
-        
-        // =============================================
-        // GESTIÓN DE MESAS
-        // =============================================
         async function cargarMesas() {
             const { data } = await supabase.from('mesas').select('*').order('numero')
             const grid = document.getElementById('mesasGrid')
-            
-            if (!data || data.length === 0) {
-                grid.innerHTML = '<p>No hay mesas registradas</p>'
-                return
-            }
-            
-            grid.innerHTML = data.map(m => `
-                <div class="mesa-card mesa-${m.estado.toLowerCase()}">
-                    <div class="mesa-numero">${m.numero}</div>
-                    <div class="mesa-capacidad">${m.capacidad} personas</div>
-                    <div style="margin-top:8px;">
-                        <span class="badge">${m.estado}</span>
-                    </div>
-                </div>
-            `).join('')
+            grid.innerHTML = data?.length ? data.map(m => `<div class="mesa-card mesa-${m.estado.toLowerCase()}"><div class="mesa-numero">${m.numero}</div><div class="mesa-capacidad">${m.capacidad} pers</div><span class="badge">${m.estado}</span></div>`).join('') : '<p>No hay mesas</p>'
         }
-        
-        window.mostrarFormMesa = function() {
-            document.getElementById('formMesa').style.display = 'block'
+        window.mostrarFormMesa = () => document.getElementById('formMesa').style.display = 'block'
+        window.cancelarFormMesa = () => document.getElementById('formMesa').style.display = 'none'
+        window.guardarMesa = async function(e) {
+            e.preventDefault()
+            const { error } = await supabase.from('mesas').insert({ numero: document.getElementById('mesaNumero').value, capacidad: parseInt(document.getElementById('mesaCapacidad').value), estado: 'Disponible' })
+            if (!error) { document.getElementById('formMesa').style.display = 'none'; document.getElementById('mesaNumero').value = document.getElementById('mesaCapacidad').value = ''; cargarMesas() }
         }
-        
-        window.cancelarFormMesa = function() {
-            document.getElementById('formMesa').style.display = 'none'
-        }
-        
-        window.guardarMesa = async function(event) {
-            event.preventDefault()
-            const mesa = {
-                numero: document.getElementById('mesaNumero').value,
-                capacidad: parseInt(document.getElementById('mesaCapacidad').value),
-                estado: 'Disponible'
-            }
-            
-            const { error } = await supabase.from('mesas').insert(mesa)
-            
-            if (error) {
-                document.getElementById('mensajeMesas').innerHTML = `<div class="msg-error">Error: ${error.message}</div>`
-            } else {
-                document.getElementById('formMesa').style.display = 'none'
-                document.getElementById('mesaNumero').value = ''
-                document.getElementById('mesaCapacidad').value = ''
-                document.getElementById('mensajeMesas').innerHTML = '<div class="msg-success">Mesa agregada</div>'
-                cargarMesas()
-            }
-        }
-        
-        // Cargar datos iniciales
         cargarProductos()
-        
-        // Exponer funciones globalmente
         window.editarProducto = editarProducto
         window.eliminarProducto = eliminarProducto
         window.guardarProducto = guardarProducto
