@@ -5,366 +5,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pedidos · Cafetería</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #F5F0E8;
-            min-height: 100vh;
-            padding: 24px;
-            color: #3A3A3A;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .nav {
-            display: flex;
-            gap: 32px;
-            padding-bottom: 20px;
-            margin-bottom: 24px;
-            border-bottom: 1px solid rgba(156, 175, 136, 0.2);
-        }
-
-        .nav a {
-            color: #5C7A67;
-            text-decoration: none;
-            font-size: 15px;
-            font-weight: 450;
-            transition: all 0.2s;
-            padding-bottom: 4px;
-            border-bottom: 2px solid transparent;
-        }
-
-        .nav a:hover {
-            color: #3E5C4B;
-            border-bottom-color: #9CAF88;
-        }
-
-        .nav a.active {
-            color: #3E5C4B;
-            border-bottom-color: #9CAF88;
-        }
-
-        h1 {
-            font-size: 32px;
-            font-weight: 450;
-            letter-spacing: -0.02em;
-            color: #3E5C4B;
-            margin-bottom: 24px;
-        }
-
-        .pos-layout {
-            display: grid;
-            grid-template-columns: 1fr 380px;
-            gap: 24px;
-        }
-
-        .productos-panel {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(8px);
-            border-radius: 20px;
-            padding: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.6);
-        }
-
-        .panel-title {
-            font-size: 16px;
-            font-weight: 500;
-            color: #3E5C4B;
-            margin-bottom: 20px;
-        }
-
-        .categorias-filter {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 24px;
-        }
-
-        .cat-btn {
-            background: transparent;
-            border: 1.5px solid rgba(156, 175, 136, 0.2);
-            padding: 8px 16px;
-            border-radius: 30px;
-            font-size: 13px;
-            color: #5C7A67;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .cat-btn:hover {
-            background: rgba(156, 175, 136, 0.1);
-        }
-
-        .cat-btn.active {
-            background: #9CAF88;
-            color: white;
-            border-color: #9CAF88;
-        }
-
-        .productos-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 12px;
-            max-height: 500px;
-            overflow-y: auto;
-        }
-
-        .producto-card {
-            background: white;
-            padding: 16px;
-            border-radius: 14px;
-            border: 1.5px solid rgba(156, 175, 136, 0.15);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .producto-card:hover {
-            border-color: #9CAF88;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-        }
-
-        .producto-nombre {
-            font-weight: 500;
-            color: #3E5C4B;
-            margin-bottom: 4px;
-        }
-
-        .producto-precio {
-            font-size: 18px;
-            font-weight: 450;
-            color: #5C7A67;
-        }
-
-        .pedido-panel {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(8px);
-            border-radius: 20px;
-            padding: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            display: flex;
-            flex-direction: column;
-            height: fit-content;
-        }
-
-        .mesa-selector {
-            margin-bottom: 24px;
-        }
-
-        .mesa-grid-mini {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin-top: 8px;
-        }
-
-        .mesa-btn {
-            background: white;
-            border: 1.5px solid rgba(156, 175, 136, 0.2);
-            padding: 10px;
-            border-radius: 12px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .mesa-btn:hover {
-            border-color: #9CAF88;
-        }
-
-        .mesa-btn.active {
-            background: #9CAF88;
-            color: white;
-            border-color: #9CAF88;
-        }
-
-        .mesa-btn.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            background: #f0f0f0;
-        }
-
-        .cliente-section {
-            margin-bottom: 24px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid rgba(156, 175, 136, 0.15);
-        }
-
-        .cliente-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 8px;
-        }
-
-        .carrito-items {
-            flex: 1;
-            max-height: 350px;
-            overflow-y: auto;
-            margin-bottom: 20px;
-        }
-
-        .carrito-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(156, 175, 136, 0.1);
-        }
-
-        .carrito-item-info {
-            flex: 1;
-        }
-
-        .carrito-item-nombre {
-            font-weight: 450;
-            color: #3A3A3A;
-        }
-
-        .carrito-item-precio {
-            font-size: 13px;
-            color: #7C9082;
-        }
-
-        .carrito-item-cantidad {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .cantidad-btn {
-            background: transparent;
-            border: 1px solid rgba(156, 175, 136, 0.3);
-            width: 28px;
-            height: 28px;
-            border-radius: 8px;
-            cursor: pointer;
-            color: #5C7A67;
-        }
-
-        .total-section {
-            padding-top: 20px;
-            border-top: 2px solid rgba(156, 175, 136, 0.2);
-            margin-bottom: 20px;
-        }
-
-        .total-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-        }
-
-        .total-final {
-            font-size: 20px;
-            font-weight: 500;
-            color: #3E5C4B;
-            margin-top: 8px;
-            padding-top: 8px;
-            border-top: 1px solid rgba(156, 175, 136, 0.15);
-        }
-
-        .metodo-pago {
-            margin-bottom: 20px;
-        }
-
-        .pago-opciones {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-top: 8px;
-        }
-
-        .pago-btn {
-            background: white;
-            border: 1.5px solid rgba(156, 175, 136, 0.2);
-            padding: 10px;
-            border-radius: 12px;
-            text-align: center;
-            cursor: pointer;
-            font-size: 13px;
-        }
-
-        .pago-btn.active {
-            background: #9CAF88;
-            color: white;
-            border-color: #9CAF88;
-        }
-
-        .btn {
-            background: #9CAF88;
-            color: white;
-            border: none;
-            padding: 14px;
-            border-radius: 40px;
-            font-size: 15px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            width: 100%;
-        }
-
-        .btn:hover {
-            background: #7C9082;
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: #5C7A67;
-            border: 1.5px solid #9CAF88;
-            padding: 8px 14px;
-            font-size: 13px;
-        }
-
-        .msg-success {
-            color: #5C7A67;
-            background: rgba(156, 175, 136, 0.12);
-            padding: 12px;
-            border-radius: 14px;
-            margin-bottom: 16px;
-        }
-
-        .msg-error {
-            color: #C46B6B;
-            background: rgba(196, 107, 107, 0.06);
-            padding: 12px;
-            border-radius: 14px;
-            margin-bottom: 16px;
-        }
-
-        select, input {
-            width: 100%;
-            padding: 10px 14px;
-            background: white;
-            border: 1.5px solid rgba(156, 175, 136, 0.2);
-            border-radius: 12px;
-            font-size: 14px;
-        }
-
-        .badge {
-            background: rgba(156, 175, 136, 0.15);
-            color: #5C7A67;
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-size: 12px;
-        }
-
-        .flex-between {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .gap-2 { gap: 8px; }
-        .mt-3 { margin-top: 16px; }
-        .mb-3 { margin-bottom: 16px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: #F5F0E8; min-height: 100vh; padding: 24px; color: #3A3A3A; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .nav { display: flex; gap: 32px; padding-bottom: 20px; margin-bottom: 24px; border-bottom: 1px solid rgba(156, 175, 136, 0.2); }
+        .nav a { color: #5C7A67; text-decoration: none; font-size: 15px; font-weight: 450; padding-bottom: 4px; border-bottom: 2px solid transparent; }
+        .nav a:hover { color: #3E5C4B; border-bottom-color: #9CAF88; }
+        .nav a.active { color: #3E5C4B; border-bottom-color: #9CAF88; }
+        h1 { font-size: 32px; font-weight: 450; color: #3E5C4B; margin-bottom: 24px; }
+        .pos-layout { display: grid; grid-template-columns: 1fr 380px; gap: 24px; }
+        .productos-panel { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(8px); border-radius: 20px; padding: 24px; border: 1px solid rgba(255, 255, 255, 0.6); }
+        .panel-title { font-size: 16px; font-weight: 500; color: #3E5C4B; margin-bottom: 20px; }
+        .categorias-filter { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+        .cat-btn { background: transparent; border: 1.5px solid rgba(156, 175, 136, 0.2); padding: 8px 16px; border-radius: 30px; font-size: 13px; color: #5C7A67; cursor: pointer; }
+        .cat-btn:hover { background: rgba(156, 175, 136, 0.1); }
+        .cat-btn.active { background: #9CAF88; color: white; border-color: #9CAF88; }
+        .productos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; max-height: 500px; overflow-y: auto; }
+        .producto-card { background: white; padding: 16px; border-radius: 14px; border: 1.5px solid rgba(156, 175, 136, 0.15); cursor: pointer; }
+        .producto-card:hover { border-color: #9CAF88; transform: translateY(-2px); }
+        .producto-nombre { font-weight: 500; color: #3E5C4B; margin-bottom: 4px; }
+        .producto-precio { font-size: 18px; font-weight: 450; color: #5C7A67; }
+        .pedido-panel { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(8px); border-radius: 20px; padding: 24px; border: 1px solid rgba(255, 255, 255, 0.6); height: fit-content; }
+        .mesa-selector { margin-bottom: 24px; }
+        .mesa-grid-mini { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px; }
+        .mesa-btn { background: white; border: 1.5px solid rgba(156, 175, 136, 0.2); padding: 10px; border-radius: 12px; text-align: center; cursor: pointer; }
+        .mesa-btn:hover { border-color: #9CAF88; }
+        .mesa-btn.active { background: #9CAF88; color: white; border-color: #9CAF88; }
+        .mesa-btn.disabled { opacity: 0.5; cursor: not-allowed; background: #f0f0f0; }
+        .cliente-section { margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid rgba(156, 175, 136, 0.15); }
+        .carrito-items { flex: 1; max-height: 350px; overflow-y: auto; margin-bottom: 20px; }
+        .carrito-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(156, 175, 136, 0.1); }
+        .carrito-item-info { flex: 1; }
+        .carrito-item-nombre { font-weight: 450; color: #3A3A3A; }
+        .carrito-item-precio { font-size: 13px; color: #7C9082; }
+        .carrito-item-cantidad { display: flex; align-items: center; gap: 8px; }
+        .cantidad-btn { background: transparent; border: 1px solid rgba(156, 175, 136, 0.3); width: 28px; height: 28px; border-radius: 8px; cursor: pointer; color: #5C7A67; }
+        .total-section { padding-top: 20px; border-top: 2px solid rgba(156, 175, 136, 0.2); margin-bottom: 20px; }
+        .total-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .total-final { font-size: 20px; font-weight: 500; color: #3E5C4B; margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(156, 175, 136, 0.15); }
+        .metodo-pago { margin-bottom: 20px; }
+        .pago-opciones { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
+        .pago-btn { background: white; border: 1.5px solid rgba(156, 175, 136, 0.2); padding: 10px; border-radius: 12px; text-align: center; cursor: pointer; font-size: 13px; }
+        .pago-btn.active { background: #9CAF88; color: white; border-color: #9CAF88; }
+        .btn { background: #9CAF88; color: white; border: none; padding: 14px; border-radius: 40px; font-size: 15px; font-weight: 500; cursor: pointer; width: 100%; }
+        .btn:hover { background: #7C9082; }
+        .btn-outline { background: transparent; color: #5C7A67; border: 1.5px solid #9CAF88; padding: 8px 14px; font-size: 13px; }
+        .msg-success { color: #5C7A67; background: rgba(156, 175, 136, 0.12); padding: 12px; border-radius: 14px; margin-bottom: 16px; }
+        .msg-error { color: #C46B6B; background: rgba(196, 107, 107, 0.06); padding: 12px; border-radius: 14px; margin-bottom: 16px; }
+        select, input { width: 100%; padding: 10px 14px; background: white; border: 1.5px solid rgba(156, 175, 136, 0.2); border-radius: 12px; font-size: 14px; }
+        .badge { background: rgba(156, 175, 136, 0.15); color: #5C7A67; padding: 2px 8px; border-radius: 20px; font-size: 12px; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
     </style>
 </head>
 <body>
@@ -375,422 +65,83 @@
             <a href="/admin.html">Administración</a>
             <a href="/pedidos.html" class="active">Pedidos</a>
         </div>
-        
         <h1>Nuevo pedido</h1>
-        
         <div class="pos-layout">
             <div class="productos-panel">
                 <div class="panel-title">Menú</div>
-                <div class="categorias-filter" id="categoriasFilter">
-                    <button class="cat-btn active" onclick="filtrarPorCategoria(null)">Todos</button>
-                </div>
+                <div class="categorias-filter" id="categoriasFilter"><button class="cat-btn active" onclick="filtrarPorCategoria(null)">Todos</button></div>
                 <div class="productos-grid" id="productosGrid"></div>
             </div>
-            
             <div class="pedido-panel">
                 <div id="mensajePedido"></div>
-                
-                <div class="mesa-selector">
-                    <label>Mesa</label>
-                    <div class="mesa-grid-mini" id="mesasGrid"></div>
-                </div>
-                
-                <div class="cliente-section">
-                    <div class="flex-between">
-                        <label>Cliente</label>
-                        <button class="btn-outline" onclick="mostrarFormCliente()">+ Nuevo</button>
-                    </div>
-                    <select id="clienteSelect" onchange="clienteSeleccionado()">
-                        <option value="">Cliente general</option>
-                    </select>
-                </div>
-                
-                <div class="carrito-items" id="carritoItems">
-                    <p style="color:#7C9082; text-align:center; padding:20px;">Agrega productos</p>
-                </div>
-                
-                <div class="total-section">
-                    <div class="total-row">
-                        <span>Subtotal</span>
-                        <span id="subtotal">$0.00</span>
-                    </div>
-                    <div class="total-row total-final">
-                        <span>Total</span>
-                        <span id="total">$0.00</span>
-                    </div>
-                </div>
-                
-                <div class="metodo-pago">
-                    <label>Método de pago</label>
-                    <div class="pago-opciones">
-                        <div class="pago-btn active" data-pago="Efectivo" onclick="seleccionarPago('Efectivo')">Efectivo</div>
-                        <div class="pago-btn" data-pago="Tarjeta" onclick="seleccionarPago('Tarjeta')">Tarjeta</div>
-                        <div class="pago-btn" data-pago="Digital" onclick="seleccionarPago('Digital')">Digital</div>
-                    </div>
-                </div>
-                
+                <div class="mesa-selector"><label>Mesa</label><div class="mesa-grid-mini" id="mesasGrid"></div></div>
+                <div class="cliente-section"><div class="flex-between"><label>Cliente</label><button class="btn-outline" onclick="mostrarFormCliente()">+ Nuevo</button></div><select id="clienteSelect" onchange="clienteSeleccionado()"><option value="">Cliente general</option></select></div>
+                <div class="carrito-items" id="carritoItems"><p style="color:#7C9082; text-align:center; padding:20px;">Agrega productos</p></div>
+                <div class="total-section"><div class="total-row"><span>Subtotal</span><span id="subtotal">$0.00</span></div><div class="total-row total-final"><span>Total</span><span id="total">$0.00</span></div></div>
+                <div class="metodo-pago"><label>Método de pago</label><div class="pago-opciones"><div class="pago-btn active" data-pago="Efectivo" onclick="seleccionarPago('Efectivo')">Efectivo</div><div class="pago-btn" data-pago="Tarjeta" onclick="seleccionarPago('Tarjeta')">Tarjeta</div><div class="pago-btn" data-pago="Digital" onclick="seleccionarPago('Digital')">Digital</div></div></div>
                 <button class="btn" onclick="finalizarPedido()">Finalizar pedido</button>
-                
-                <div style="margin-top:24px; padding-top:20px; border-top:1px solid rgba(156,175,136,0.15);">
-                    <div class="flex-between mb-3">
-                        <span style="font-weight:500; color:#3E5C4B;">Pedidos activos</span>
-                        <span class="badge" id="countActivos">0</span>
-                    </div>
-                    <div id="pedidosActivos"></div>
-                </div>
+                <div style="margin-top:24px; padding-top:20px; border-top:1px solid rgba(156,175,136,0.15);"><div class="flex-between mb-3"><span style="font-weight:500; color:#3E5C4B;">Pedidos activos</span><span class="badge" id="countActivos">0</span></div><div id="pedidosActivos"></div></div>
             </div>
         </div>
-        
         <div id="modalCliente" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.3); backdrop-filter:blur(4px); align-items:center; justify-content:center;">
             <div style="background:white; padding:28px; border-radius:24px; width:400px;">
                 <h3 style="margin-bottom:20px; color:#3E5C4B;">Nuevo cliente</h3>
                 <form onsubmit="guardarCliente(event)">
-                    <div style="margin-bottom:16px;">
-                        <label>Nombre</label>
-                        <input type="text" id="clienteNombre" required>
-                    </div>
-                    <div style="margin-bottom:16px;">
-                        <label>Email</label>
-                        <input type="email" id="clienteEmail">
-                    </div>
-                    <div style="margin-bottom:16px;">
-                        <label>Teléfono</label>
-                        <input type="text" id="clienteTelefono">
-                    </div>
-                    <div style="display:flex; gap:12px;">
-                        <button type="submit" class="btn" style="padding:12px;">Guardar</button>
-                        <button type="button" class="btn-outline" onclick="cerrarModalCliente()">Cancelar</button>
-                    </div>
+                    <div style="margin-bottom:16px;"><label>Nombre</label><input type="text" id="clienteNombre" required></div>
+                    <div style="margin-bottom:16px;"><label>Email</label><input type="email" id="clienteEmail"></div>
+                    <div style="margin-bottom:16px;"><label>Teléfono</label><input type="text" id="clienteTelefono"></div>
+                    <div style="display:flex; gap:12px;"><button type="submit" class="btn" style="padding:12px;">Guardar</button><button type="button" class="btn-outline" onclick="cerrarModalCliente()">Cancelar</button></div>
                 </form>
             </div>
         </div>
     </div>
-
     <script type="module">
         const SUPABASE_URL = 'https://knciklpjeboeznbvajil.supabase.co'
         const SUPABASE_KEY = 'sb_publishable_8xwi4BOCYmqXx-VqdXuZwA_cmd5CeNj'
-        
         import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
         const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
-        
-        let pedidoActual = {
-            mesa_id: null,
-            cliente_id: null,
-            items: [],
-            metodo_pago: 'Efectivo'
-        }
-        
-        let productosData = []
-        let categoriasData = []
-        let categoriaActual = null
-        
-        const { data: { session } } = await supabase.auth.getSession()
-        if (!session) {
-            alert('Debes iniciar sesión')
-            window.location.href = '/'
-        }
-        
-        async function inicializar() {
-            await cargarCategorias()
-            await cargarProductos()
-            await cargarMesas()
-            await cargarClientes()
-            await cargarPedidosActivos()
-        }
-        
-        async function cargarCategorias() {
-            const { data } = await supabase.from('categorias').select('*').order('nombre')
-            categoriasData = data || []
-            
-            const filter = document.getElementById('categoriasFilter')
-            filter.innerHTML = '<button class="cat-btn active" onclick="filtrarPorCategoria(null)">Todos</button>' +
-                categoriasData.map(c => 
-                    `<button class="cat-btn" onclick="filtrarPorCategoria(${c.id})">${c.nombre}</button>`
-                ).join('')
-        }
-        
-        async function cargarProductos() {
-            const { data } = await supabase.from('productos').select('*, categorias(nombre)').eq('disponible', true).order('nombre')
-            productosData = data || []
-            renderizarProductos()
-        }
-        
-        window.filtrarPorCategoria = function(categoriaId) {
-            categoriaActual = categoriaId
-            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'))
-            renderizarProductos()
-        }
-        
-        function renderizarProductos() {
-            const grid = document.getElementById('productosGrid')
-            const productosFiltrados = categoriaActual 
-                ? productosData.filter(p => p.categoria_id === categoriaActual)
-                : productosData
-            
-            if (productosFiltrados.length === 0) {
-                grid.innerHTML = '<p style="grid-column:1/-1; color:#7C9082;">No hay productos</p>'
-                return
-            }
-            
-            grid.innerHTML = productosFiltrados.map(p => `
-                <div class="producto-card" onclick="agregarAlCarrito(${p.id})">
-                    <div class="producto-nombre">${p.nombre}</div>
-                    <div class="producto-precio">$${Number(p.precio).toFixed(2)}</div>
-                </div>
-            `).join('')
-        }
-        
-        async function cargarMesas() {
-            const { data } = await supabase.from('mesas').select('*').order('numero')
-            const grid = document.getElementById('mesasGrid')
-            
-            if (!data) return
-            
-            grid.innerHTML = data.map(m => `
-                <div class="mesa-btn ${m.estado !== 'Disponible' ? 'disabled' : ''}" 
-                     onclick="seleccionarMesa(${m.id}, '${m.estado}')">
-                    ${m.numero}
-                </div>
-            `).join('')
-        }
-        
-        window.seleccionarMesa = function(mesaId, estado) {
-            if (estado !== 'Disponible') {
-                alert('Mesa no disponible')
-                return
-            }
-            
-            document.querySelectorAll('.mesa-btn').forEach(btn => btn.classList.remove('active'))
-            event.target.classList.add('active')
-            pedidoActual.mesa_id = mesaId
-        }
-        
-        async function cargarClientes() {
-            const { data } = await supabase.from('clientes').select('*').order('nombre')
-            const select = document.getElementById('clienteSelect')
-            
-            select.innerHTML = '<option value="">Cliente general</option>' +
-                (data || []).map(c => `<option value="${c.id}">${c.nombre}</option>`).join('')
-        }
-        
-        window.clienteSeleccionado = function() {
-            const select = document.getElementById('clienteSelect')
-            pedidoActual.cliente_id = select.value || null
-        }
-        
-        window.mostrarFormCliente = function() {
-            document.getElementById('modalCliente').style.display = 'flex'
-        }
-        
-        window.cerrarModalCliente = function() {
-            document.getElementById('modalCliente').style.display = 'none'
-        }
-        
-        window.guardarCliente = async function(event) {
-            event.preventDefault()
-            
-            const cliente = {
-                nombre: document.getElementById('clienteNombre').value,
-                email: document.getElementById('clienteEmail').value || null,
-                telefono: document.getElementById('clienteTelefono').value || null,
-                puntos_fidelidad: 0
-            }
-            
-            const { data, error } = await supabase.from('clientes').insert(cliente).select()
-            
-            if (error) {
-                alert('Error: ' + error.message)
-            } else {
-                cerrarModalCliente()
-                await cargarClientes()
-                document.getElementById('clienteSelect').value = data[0].id
-                pedidoActual.cliente_id = data[0].id
-                document.getElementById('clienteNombre').value = ''
-                document.getElementById('clienteEmail').value = ''
-                document.getElementById('clienteTelefono').value = ''
-            }
-        }
-        
-        window.agregarAlCarrito = function(productoId) {
-            const producto = productosData.find(p => p.id === productoId)
-            if (!producto) return
-            
-            const itemExistente = pedidoActual.items.find(i => i.producto_id === productoId)
-            
-            if (itemExistente) {
-                itemExistente.cantidad++
-            } else {
-                pedidoActual.items.push({
-                    producto_id: producto.id,
-                    nombre: producto.nombre,
-                    precio_unitario: producto.precio,
-                    cantidad: 1
-                })
-            }
-            
-            renderizarCarrito()
-        }
-        
-        function renderizarCarrito() {
-            const container = document.getElementById('carritoItems')
-            
-            if (pedidoActual.items.length === 0) {
-                container.innerHTML = '<p style="color:#7C9082; text-align:center; padding:20px;">Agrega productos</p>'
-                document.getElementById('subtotal').textContent = '$0.00'
-                document.getElementById('total').textContent = '$0.00'
-                return
-            }
-            
-            container.innerHTML = pedidoActual.items.map((item, index) => `
-                <div class="carrito-item">
-                    <div class="carrito-item-info">
-                        <div class="carrito-item-nombre">${item.nombre}</div>
-                        <div class="carrito-item-precio">$${Number(item.precio_unitario).toFixed(2)} c/u</div>
-                    </div>
-                    <div class="carrito-item-cantidad">
-                        <button class="cantidad-btn" onclick="cambiarCantidad(${index}, -1)">−</button>
-                        <span>${item.cantidad}</span>
-                        <button class="cantidad-btn" onclick="cambiarCantidad(${index}, 1)">+</button>
-                    </div>
-                </div>
-            `).join('')
-            
-            actualizarTotales()
-        }
-        
-        window.cambiarCantidad = function(index, delta) {
-            const item = pedidoActual.items[index]
-            item.cantidad += delta
-            
-            if (item.cantidad <= 0) {
-                pedidoActual.items.splice(index, 1)
-            }
-            
-            renderizarCarrito()
-        }
-        
-        function actualizarTotales() {
-            const subtotal = pedidoActual.items.reduce((sum, i) => sum + (i.precio_unitario * i.cantidad), 0)
-            document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`
-            document.getElementById('total').textContent = `$${subtotal.toFixed(2)}`
-        }
-        
-        window.seleccionarPago = function(metodo) {
-            pedidoActual.metodo_pago = metodo
-            document.querySelectorAll('.pago-btn').forEach(btn => {
-                btn.classList.remove('active')
-                if (btn.dataset.pago === metodo) btn.classList.add('active')
-            })
-        }
-        
+        let pedidoActual = { mesa_id: null, cliente_id: null, items: [], metodo_pago: 'Efectivo' }
+        let productosData = [], categoriaActual = null
+        async function inicializar() { await cargarCategorias(); await cargarProductos(); await cargarMesas(); await cargarClientes(); await cargarPedidosActivos() }
+        async function cargarCategorias() { const { data } = await supabase.from('categorias').select('*').order('nombre'); const filter = document.getElementById('categoriasFilter'); filter.innerHTML = '<button class="cat-btn active" onclick="filtrarPorCategoria(null)">Todos</button>' + (data||[]).map(c => `<button class="cat-btn" onclick="filtrarPorCategoria(${c.id})">${c.nombre}</button>`).join('') }
+        async function cargarProductos() { const { data } = await supabase.from('productos').select('*, categorias(nombre)').eq('disponible', true).order('nombre'); productosData = data || []; renderizarProductos() }
+        window.filtrarPorCategoria = function(id) { categoriaActual = id; document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active')); renderizarProductos() }
+        function renderizarProductos() { const grid = document.getElementById('productosGrid'); const filtrados = categoriaActual ? productosData.filter(p => p.categoria_id === categoriaActual) : productosData; grid.innerHTML = filtrados.length ? filtrados.map(p => `<div class="producto-card" onclick="agregarAlCarrito(${p.id})"><div class="producto-nombre">${p.nombre}</div><div class="producto-precio">$${Number(p.precio).toFixed(2)}</div></div>`).join('') : '<p style="grid-column:1/-1; color:#7C9082;">No hay productos</p>' }
+        async function cargarMesas() { const { data } = await supabase.from('mesas').select('*').order('numero'); const grid = document.getElementById('mesasGrid'); if (data) grid.innerHTML = data.map(m => `<div class="mesa-btn ${m.estado!=='Disponible'?'disabled':''}" onclick="seleccionarMesa(${m.id},'${m.estado}')">${m.numero}</div>`).join('') }
+        window.seleccionarMesa = function(id, estado) { if (estado !== 'Disponible') { alert('Mesa no disponible'); return } document.querySelectorAll('.mesa-btn').forEach(btn => btn.classList.remove('active')); event.target.classList.add('active'); pedidoActual.mesa_id = id }
+        async function cargarClientes() { const { data } = await supabase.from('clientes').select('*').order('nombre'); const select = document.getElementById('clienteSelect'); select.innerHTML = '<option value="">Cliente general</option>' + (data||[]).map(c => `<option value="${c.id}">${c.nombre}</option>`).join('') }
+        window.clienteSeleccionado = function() { pedidoActual.cliente_id = document.getElementById('clienteSelect').value || null }
+        window.mostrarFormCliente = () => document.getElementById('modalCliente').style.display = 'flex'
+        window.cerrarModalCliente = () => document.getElementById('modalCliente').style.display = 'none'
+        window.guardarCliente = async function(e) { e.preventDefault(); const cliente = { nombre: document.getElementById('clienteNombre').value, email: document.getElementById('clienteEmail').value || null, telefono: document.getElementById('clienteTelefono').value || null, puntos_fidelidad: 0 }; const { data, error } = await supabase.from('clientes').insert(cliente).select(); if (!error) { cerrarModalCliente(); await cargarClientes(); document.getElementById('clienteSelect').value = data[0].id; pedidoActual.cliente_id = data[0].id; ['Nombre','Email','Telefono'].forEach(f => document.getElementById('cliente'+f).value = '') } }
+        window.agregarAlCarrito = function(id) { const p = productosData.find(x => x.id === id); if (!p) return; const item = pedidoActual.items.find(i => i.producto_id === id); item ? item.cantidad++ : pedidoActual.items.push({ producto_id: p.id, nombre: p.nombre, precio_unitario: p.precio, cantidad: 1 }); renderizarCarrito() }
+        function renderizarCarrito() { const c = document.getElementById('carritoItems'); if (!pedidoActual.items.length) { c.innerHTML = '<p style="color:#7C9082; text-align:center; padding:20px;">Agrega productos</p>'; document.getElementById('subtotal').textContent = '$0.00'; document.getElementById('total').textContent = '$0.00'; return } c.innerHTML = pedidoActual.items.map((i, idx) => `<div class="carrito-item"><div class="carrito-item-info"><div class="carrito-item-nombre">${i.nombre}</div><div class="carrito-item-precio">$${Number(i.precio_unitario).toFixed(2)} c/u</div></div><div class="carrito-item-cantidad"><button class="cantidad-btn" onclick="cambiarCantidad(${idx},-1)">−</button><span>${i.cantidad}</span><button class="cantidad-btn" onclick="cambiarCantidad(${idx},1)">+</button></div></div>`).join(''); actualizarTotales() }
+        window.cambiarCantidad = function(idx, delta) { const item = pedidoActual.items[idx]; item.cantidad += delta; if (item.cantidad <= 0) pedidoActual.items.splice(idx, 1); renderizarCarrito() }
+        function actualizarTotales() { const subtotal = pedidoActual.items.reduce((s, i) => s + (i.precio_unitario * i.cantidad), 0); document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`; document.getElementById('total').textContent = `$${subtotal.toFixed(2)}` }
+        window.seleccionarPago = function(m) { pedidoActual.metodo_pago = m; document.querySelectorAll('.pago-btn').forEach(b => { b.classList.remove('active'); if (b.dataset.pago === m) b.classList.add('active') }) }
         window.finalizarPedido = async function() {
-            const mensaje = document.getElementById('mensajePedido')
-            
-            if (!pedidoActual.mesa_id) {
-                mensaje.innerHTML = '<div class="msg-error">Selecciona una mesa</div>'
-                return
-            }
-            
-            if (pedidoActual.items.length === 0) {
-                mensaje.innerHTML = '<div class="msg-error">Agrega productos al pedido</div>'
-                return
-            }
-            
-            const total = pedidoActual.items.reduce((sum, i) => sum + (i.precio_unitario * i.cantidad), 0)
-            
-            const { data: empleado } = await supabase.from('empleados').select('id').eq('user_id', session.user.id).single()
-            
-            if (!empleado) {
-                mensaje.innerHTML = '<div class="msg-error">Empleado no encontrado</div>'
-                return
-            }
-            
-            const { data: pedido, error: errorPedido } = await supabase
-                .from('pedidos')
-                .insert({
-                    total: total,
-                    estado: 'Pendiente',
-                    cliente_id: pedidoActual.cliente_id || null,
-                    empleado_id: empleado.id,
-                    mesa_id: pedidoActual.mesa_id
-                })
-                .select()
-            
-            if (errorPedido) {
-                mensaje.innerHTML = `<div class="msg-error">Error: ${errorPedido.message}</div>`
-                return
-            }
-            
+            const msg = document.getElementById('mensajePedido')
+            if (!pedidoActual.mesa_id) { msg.innerHTML = '<div class="msg-error">Selecciona una mesa</div>'; return }
+            if (!pedidoActual.items.length) { msg.innerHTML = '<div class="msg-error">Agrega productos</div>'; return }
+            const total = pedidoActual.items.reduce((s, i) => s + (i.precio_unitario * i.cantidad), 0)
+            const { data: empleado } = await supabase.from('empleados').select('id').limit(1).single()
+            const { data: pedido, error: errPed } = await supabase.from('pedidos').insert({ total, estado: 'Pendiente', cliente_id: pedidoActual.cliente_id || null, empleado_id: empleado?.id || null, mesa_id: pedidoActual.mesa_id }).select()
+            if (errPed) { msg.innerHTML = `<div class="msg-error">Error: ${errPed.message}</div>`; return }
             const pedidoId = pedido[0].id
-            
-            const items = pedidoActual.items.map(i => ({
-                pedido_id: pedidoId,
-                producto_id: i.producto_id,
-                cantidad: i.cantidad,
-                precio_unitario: i.precio_unitario
-            }))
-            
-            const { error: errorItems } = await supabase.from('items_pedido').insert(items)
-            
-            if (errorItems) {
-                mensaje.innerHTML = `<div class="msg-error">Error en items: ${errorItems.message}</div>`
-                return
-            }
-            
-            await supabase.from('transacciones').insert({
-                pedido_id: pedidoId,
-                monto: total,
-                metodo_pago: pedidoActual.metodo_pago,
-                estado: 'Completado'
-            })
-            
+            const items = pedidoActual.items.map(i => ({ pedido_id: pedidoId, producto_id: i.producto_id, cantidad: i.cantidad, precio_unitario: i.precio_unitario }))
+            await supabase.from('items_pedido').insert(items)
+            await supabase.from('transacciones').insert({ pedido_id: pedidoId, monto: total, metodo_pago: pedidoActual.metodo_pago, estado: 'Completado' })
             await supabase.from('mesas').update({ estado: 'Ocupada' }).eq('id', pedidoActual.mesa_id)
-            
-            if (pedidoActual.cliente_id) {
-                const { data: cliente } = await supabase.from('clientes').select('puntos_fidelidad').eq('id', pedidoActual.cliente_id).single()
-                if (cliente) {
-                    const puntosGanados = Math.floor(total / 10)
-                    await supabase.from('clientes').update({ puntos_fidelidad: cliente.puntos_fidelidad + puntosGanados }).eq('id', pedidoActual.cliente_id)
-                }
-            }
-            
-            mensaje.innerHTML = '<div class="msg-success">Pedido registrado</div>'
-            
+            if (pedidoActual.cliente_id) { const { data: cli } = await supabase.from('clientes').select('puntos_fidelidad').eq('id', pedidoActual.cliente_id).single(); if (cli) await supabase.from('clientes').update({ puntos_fidelidad: cli.puntos_fidelidad + Math.floor(total/10) }).eq('id', pedidoActual.cliente_id) }
+            msg.innerHTML = '<div class="msg-success">Pedido registrado</div>'
             pedidoActual = { mesa_id: null, cliente_id: null, items: [], metodo_pago: 'Efectivo' }
             renderizarCarrito()
-            document.querySelectorAll('.mesa-btn').forEach(btn => btn.classList.remove('active'))
+            document.querySelectorAll('.mesa-btn').forEach(b => b.classList.remove('active'))
             document.getElementById('clienteSelect').value = ''
-            
             await cargarMesas()
             await cargarPedidosActivos()
         }
-        
-        async function cargarPedidosActivos() {
-            const { data } = await supabase
-                .from('pedidos')
-                .select('*, mesas(numero), clientes(nombre)')
-                .in('estado', ['Pendiente', 'En_Preparacion'])
-                .order('fecha_hora', { ascending: false })
-            
-            const container = document.getElementById('pedidosActivos')
-            document.getElementById('countActivos').textContent = data?.length || 0
-            
-            if (!data || data.length === 0) {
-                container.innerHTML = '<p style="color:#7C9082; font-size:13px;">Sin pedidos activos</p>'
-                return
-            }
-            
-            container.innerHTML = data.map(p => `
-                <div style="padding:10px 0; border-bottom:1px solid rgba(156,175,136,0.1);">
-                    <div class="flex-between">
-                        <span><strong>Mesa ${p.mesas?.numero || '?'}</strong></span>
-                        <span class="badge">${p.estado}</span>
-                    </div>
-                    <div style="font-size:13px; color:#7C9082;">Total: $${Number(p.total).toFixed(2)}</div>
-                </div>
-            `).join('')
-        }
-        
+        async function cargarPedidosActivos() { const { data } = await supabase.from('pedidos').select('*, mesas(numero)').in('estado', ['Pendiente','En_Preparacion']).order('fecha_hora', { ascending: false }); const c = document.getElementById('pedidosActivos'); document.getElementById('countActivos').textContent = data?.length || 0; c.innerHTML = data?.length ? data.map(p => `<div style="padding:10px 0; border-bottom:1px solid rgba(156,175,136,0.1);"><div class="flex-between"><span><strong>Mesa ${p.mesas?.numero||'?'}</strong></span><span class="badge">${p.estado}</span></div><div style="font-size:13px; color:#7C9082;">Total: $${Number(p.total).toFixed(2)}</div></div>`).join('') : '<p style="color:#7C9082; font-size:13px;">Sin pedidos activos</p>' }
         window.filtrarPorCategoria = filtrarPorCategoria
         window.seleccionarMesa = seleccionarMesa
         window.clienteSeleccionado = clienteSeleccionado
@@ -801,7 +152,6 @@
         window.cambiarCantidad = cambiarCantidad
         window.seleccionarPago = seleccionarPago
         window.finalizarPedido = finalizarPedido
-        
         inicializar()
     </script>
 </body>
