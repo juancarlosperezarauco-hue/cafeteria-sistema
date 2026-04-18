@@ -56,6 +56,13 @@
         select, input { width: 100%; padding: 10px 14px; background: white; border: 1.5px solid rgba(156, 175, 136, 0.2); border-radius: 12px; font-size: 14px; }
         .badge { background: rgba(156, 175, 136, 0.15); color: #5C7A67; padding: 2px 8px; border-radius: 20px; font-size: 12px; }
         .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        .estado-badge { padding: 4px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+        .estado-Pendiente { background: #FFF3CD; color: #856404; }
+        .estado-En_Preparacion { background: #CCE5FF; color: #004085; }
+        .estado-Listo { background: #D4EDDA; color: #155724; }
+        .acciones-pedido { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+        .btn-estado { background: white; border: 1px solid #9CAF88; color: #5C7A67; padding: 4px 10px; border-radius: 20px; font-size: 11px; cursor: pointer; }
+        .btn-estado:hover { background: #9CAF88; color: white; }
     </style>
 </head>
 <body>
@@ -81,7 +88,13 @@
                 <div class="total-section"><div class="total-row"><span>Subtotal</span><span id="subtotal">$0.00</span></div><div class="total-row total-final"><span>Total</span><span id="total">$0.00</span></div></div>
                 <div class="metodo-pago"><label>Método de pago</label><div class="pago-opciones"><div class="pago-btn active" data-pago="Efectivo" onclick="seleccionarPago('Efectivo')">Efectivo</div><div class="pago-btn" data-pago="Tarjeta" onclick="seleccionarPago('Tarjeta')">Tarjeta</div><div class="pago-btn" data-pago="Digital" onclick="seleccionarPago('Digital')">Digital</div></div></div>
                 <button class="btn" onclick="finalizarPedido()">Finalizar pedido</button>
-                <div style="margin-top:24px; padding-top:20px; border-top:1px solid rgba(156,175,136,0.15);"><div class="flex-between mb-3"><span style="font-weight:500; color:#3E5C4B;">Pedidos activos</span><span class="badge" id="countActivos">0</span></div><div id="pedidosActivos"></div></div>
+                <div style="margin-top:24px; padding-top:20px; border-top:1px solid rgba(156,175,136,0.15);">
+                    <div class="flex-between mb-3">
+                        <span style="font-weight:500; color:#3E5C4B;">Pedidos activos</span>
+                        <span class="badge" id="countActivos">0</span>
+                    </div>
+                    <div id="pedidosActivos"></div>
+                </div>
             </div>
         </div>
         <div id="modalCliente" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.3); backdrop-filter:blur(4px); align-items:center; justify-content:center;">
@@ -104,9 +117,27 @@
         const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
         
         let pedidoActual = { mesa_id: null, cliente_id: null, items: [], metodo_pago: 'Efectivo' }
-        let productosData = [], categoriaActual = null
+        let productosData = [], categoriaActual = null, usuarioRol = null
         
-        async function inicializar() { await cargarCategorias(); await cargarProductos(); await cargarMesas(); await cargarClientes(); await cargarPedidosActivos() }
+        async function inicializar() {
+            await obtenerRolUsuario()
+            await cargarCategorias()
+            await cargarProductos()
+            await cargarMesas()
+            await cargarClientes()
+            await cargarPedidosActivos()
+        }
+        
+        async function obtenerRolUsuario() {
+            const { data: { session } } = await supabase.auth.getSession()
+            if (session) {
+                const { data: empleado } = await supabase.from('empleados').select('rol').eq('user_id', session.user.id).single()
+                usuarioRol = empleado?.rol || 'Cajero'
+            } else {
+                usuarioRol = 'Cajero'
+            }
+        }
+        
         async function cargarCategorias() { const { data } = await supabase.from('categorias').select('*').order('nombre'); const filter = document.getElementById('categoriasFilter'); filter.innerHTML = '<button class="cat-btn active" onclick="filtrarPorCategoria(null)">Todos</button>' + (data||[]).map(c => `<button class="cat-btn" onclick="filtrarPorCategoria(${c.id})">${c.nombre}</button>`).join('') }
         async function cargarProductos() { const { data } = await supabase.from('productos').select('*, categorias(nombre)').eq('disponible', true).order('nombre'); productosData = data || []; renderizarProductos() }
         window.filtrarPorCategoria = function(id) { categoriaActual = id; document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active')); renderizarProductos() }
@@ -135,11 +166,16 @@
             if (!pedidoActual.items.length) { msg.innerHTML = '<div class="msg-error">Agrega productos</div>'; return }
             
             const total = pedidoActual.items.reduce((s, i) => s + (i.precio_unitario * i.cantidad), 0)
-            const { data: empleado } = await supabase.from('empleados').select('id, nombre, apellido').limit(1).single()
+            const { data: { session } } = await supabase.auth.getSession()
+            let empleadoId = null, empleadoNombre = 'Sistema'
+            if (session) {
+                const { data: emp } = await supabase.from('empleados').select('id, nombre, apellido').eq('user_id', session.user.id).single()
+                if (emp) { empleadoId = emp.id; empleadoNombre = `${emp.nombre} ${emp.apellido}` }
+            }
             
             const { data: pedido, error: errPed } = await supabase.from('pedidos').insert({
                 total, estado: 'Pendiente', cliente_id: pedidoActual.cliente_id || null,
-                empleado_id: empleado?.id || null, mesa_id: pedidoActual.mesa_id
+                empleado_id: empleadoId, mesa_id: pedidoActual.mesa_id
             }).select()
             
             if (errPed) { msg.innerHTML = `<div class="msg-error">Error: ${errPed.message}</div>`; return }
@@ -173,7 +209,7 @@
             doc.text(`Fecha: ${new Date().toLocaleString('es')}`, 14, 52)
             doc.text(`Cliente: ${clienteNombre}`, 14, 60)
             doc.text(`Mesa: ${mesa?.numero || 'N/A'}`, 14, 68)
-            doc.text(`Atendio: ${empleado ? empleado.nombre + ' ' + empleado.apellido : 'Sistema'}`, 14, 76)
+            doc.text(`Atendio: ${empleadoNombre}`, 14, 76)
             doc.text('----------------------------------------', 105, 84, { align: 'center' })
             let y = 94
             doc.setFontSize(10)
@@ -214,12 +250,48 @@
             await cargarPedidosActivos()
         }
         
-        async function cargarPedidosActivos() { 
-            const { data } = await supabase.from('pedidos').select('*, mesas(numero)').in('estado', ['Pendiente','En_Preparacion']).order('fecha_hora', { ascending: false })
-            document.getElementById('countActivos').textContent = data?.length || 0
-            document.getElementById('pedidosActivos').innerHTML = data?.length ? data.map(p => `<div style="padding:10px 0; border-bottom:1px solid rgba(156,175,136,0.1);"><div class="flex-between"><span><strong>Mesa ${p.mesas?.numero||'?'}</strong></span><span class="badge">${p.estado}</span></div><div style="font-size:13px; color:#7C9082;">Total: $${Number(p.total).toFixed(2)}</div></div>`).join('') : '<p style="color:#7C9082;">Sin pedidos activos</p>'
+        window.cambiarEstadoPedido = async function(pedidoId, nuevoEstado) {
+            await supabase.from('pedidos').update({ estado: nuevoEstado }).eq('id', pedidoId)
+            if (nuevoEstado === 'Entregado') {
+                const { data: pedido } = await supabase.from('pedidos').select('mesa_id').eq('id', pedidoId).single()
+                if (pedido?.mesa_id) await supabase.from('mesas').update({ estado: 'Disponible' }).eq('id', pedido.mesa_id)
+            }
+            await cargarPedidosActivos()
         }
         
+        async function cargarPedidosActivos() { 
+            const { data } = await supabase.from('pedidos').select('*, mesas(numero)').in('estado', ['Pendiente','En_Preparacion','Listo']).order('fecha_hora', { ascending: false })
+            document.getElementById('countActivos').textContent = data?.length || 0
+            const container = document.getElementById('pedidosActivos')
+            if (!data || data.length === 0) {
+                container.innerHTML = '<p style="color:#7C9082;">Sin pedidos activos</p>'
+                return
+            }
+            
+            container.innerHTML = data.map(p => {
+                const estadoClass = `estado-${p.estado.replace(' ', '_')}`
+                let botones = ''
+                if (usuarioRol === 'Admin' || usuarioRol === 'Barista') {
+                    if (p.estado === 'Pendiente') botones += `<button class="btn-estado" onclick="cambiarEstadoPedido(${p.id}, 'En_Preparacion')">Preparar</button>`
+                    if (p.estado === 'En_Preparacion') botones += `<button class="btn-estado" onclick="cambiarEstadoPedido(${p.id}, 'Listo')">Listo</button>`
+                    if (p.estado === 'Listo') botones += `<button class="btn-estado" onclick="cambiarEstadoPedido(${p.id}, 'Entregado')">Entregar</button>`
+                }
+                if (usuarioRol === 'Admin') {
+                    botones += `<button class="btn-estado" onclick="cambiarEstadoPedido(${p.id}, 'Cancelado')">Cancelar</button>`
+                }
+                
+                return `<div style="padding:10px 0; border-bottom:1px solid rgba(156,175,136,0.1);">
+                    <div class="flex-between">
+                        <span><strong>Mesa ${p.mesas?.numero||'?'}</strong></span>
+                        <span class="estado-badge ${estadoClass}">${p.estado}</span>
+                    </div>
+                    <div style="font-size:13px; color:#7C9082;">Total: $${Number(p.total).toFixed(2)}</div>
+                    ${botones ? `<div class="acciones-pedido">${botones}</div>` : ''}
+                </div>`
+            }).join('')
+        }
+        
+        window.cambiarEstadoPedido = cambiarEstadoPedido
         window.filtrarPorCategoria = filtrarPorCategoria
         window.seleccionarMesa = seleccionarMesa
         window.clienteSeleccionado = clienteSeleccionado
