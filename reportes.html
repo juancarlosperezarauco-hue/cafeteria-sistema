@@ -39,54 +39,43 @@
             <a href="/admin.html">Administración</a>
             <a href="/pedidos.html">Pedidos</a>
         </div>
-        
         <h1>Análisis</h1>
-        
         <div class="kpi-grid">
             <div class="kpi-card"><div class="kpi-label">Ventas totales</div><div class="kpi-value" id="ventasTotales">$0</div></div>
             <div class="kpi-card"><div class="kpi-label">Pedidos</div><div class="kpi-value" id="totalPedidos">0</div></div>
             <div class="kpi-card"><div class="kpi-label">Ticket promedio</div><div class="kpi-value" id="ticketPromedio">$0</div></div>
             <div class="kpi-card"><div class="kpi-label">Clientes</div><div class="kpi-value" id="totalClientes">0</div></div>
         </div>
-        
         <div class="charts-grid">
             <div class="chart-card"><div class="chart-title">Productos más populares</div><canvas id="productosChart"></canvas></div>
             <div class="chart-card"><div class="chart-title">Ventas · Última semana</div><canvas id="ventasChart"></canvas></div>
         </div>
-        
         <div class="table-wrapper">
             <div class="section-title">Clientes frecuentes</div>
             <table><thead><tr><th>Nombre</th><th>Contacto</th><th>Puntos</th><th>Registro</th></tr></thead>
             <tbody id="clientesBody"><tr><td colspan="4">Cargando...</td></tr></tbody></table>
         </div>
-        
         <div class="table-wrapper">
             <div class="section-title">Catálogo</div>
             <table><thead><tr><th>Producto</th><th>Categoría</th><th>Precio</th><th>Estado</th></tr></thead>
             <tbody id="productosBody"><tr><td colspan="4">Cargando...</td></tr></tbody></table>
         </div>
     </div>
-
     <script type="module">
         const SUPABASE_URL = 'https://knciklpjeboeznbvajil.supabase.co'
         const SUPABASE_KEY = 'sb_publishable_8xwi4BOCYmqXx-VqdXuZwA_cmd5CeNj'
-        
         import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
         const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
-        
         async function cargarTodo() {
             await cargarKPIs()
             await cargarProductos()
             await cargarClientes()
             cargarGraficas()
         }
-        
         async function cargarKPIs() {
             const { count } = await supabase.from('clientes').select('*', { count: 'exact', head: true })
             document.getElementById('totalClientes').textContent = count || 0
-            
             const { data: pedidos } = await supabase.from('pedidos').select('total').eq('estado', 'Entregado')
-            
             if (pedidos && pedidos.length > 0) {
                 const total = pedidos.reduce((sum, p) => sum + Number(p.total), 0)
                 document.getElementById('ventasTotales').textContent = `$${total.toFixed(0)}`
@@ -98,52 +87,28 @@
                 document.getElementById('ticketPromedio').textContent = '$0'
             }
         }
-        
         async function cargarProductos() {
             const { data, error } = await supabase.from('productos').select('*, categorias(nombre)').order('nombre')
             const tbody = document.getElementById('productosBody')
-            
             if (error || !data || data.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="4">No hay productos</td></tr>'
                 return
             }
-            
-            tbody.innerHTML = data.map(p => `
-                <tr><td>${p.nombre}</td><td>${p.categorias?.nombre || 'General'}</td>
-                <td>$${Number(p.precio).toFixed(2)}</td>
-                <td><span class="badge ${p.disponible ? 'badge-success' : 'badge-warning'}">${p.disponible ? 'Disponible' : 'Agotado'}</span></td></tr>
-            `).join('')
+            tbody.innerHTML = data.map(p => `<tr><td>${p.nombre}</td><td>${p.categorias?.nombre || 'General'}</td><td>$${Number(p.precio).toFixed(2)}</td><td><span class="badge ${p.disponible ? 'badge-success' : 'badge-warning'}">${p.disponible ? 'Disponible' : 'Agotado'}</span></td></tr>`).join('')
         }
-        
         async function cargarClientes() {
             const { data, error } = await supabase.from('clientes').select('*').order('puntos_fidelidad', { ascending: false })
             const tbody = document.getElementById('clientesBody')
-            
             if (error || !data || data.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="4">Sin clientes registrados</td></tr>'
                 return
             }
-            
-            tbody.innerHTML = data.map(c => `
-                <tr><td>${c.nombre}</td><td>${c.email || c.telefono || '—'}</td>
-                <td>${c.puntos_fidelidad}</td><td>${new Date(c.fecha_registro).toLocaleDateString('es')}</td></tr>
-            `).join('')
+            tbody.innerHTML = data.map(c => `<tr><td>${c.nombre}</td><td>${c.email || c.telefono || '—'}</td><td>${c.puntos_fidelidad}</td><td>${new Date(c.fecha_registro).toLocaleDateString('es')}</td></tr>`).join('')
         }
-        
         function cargarGraficas() {
-            new Chart(document.getElementById('productosChart'), {
-                type: 'doughnut',
-                data: { labels: ['Café', 'Té', 'Postres', 'Sándwiches', 'Bebidas'], datasets: [{ data: [42, 18, 22, 10, 8], backgroundColor: ['#7C9082', '#9CAF88', '#C4A484', '#D4C5B5', '#B5C4A2'] }] },
-                options: { cutout: '65%', plugins: { legend: { position: 'bottom' } } }
-            })
-            
-            new Chart(document.getElementById('ventasChart'), {
-                type: 'line',
-                data: { labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'], datasets: [{ data: [1240, 890, 1520, 1780, 2350, 1980, 1120], borderColor: '#7C9082', borderWidth: 2, tension: 0.3, fill: true }] },
-                options: { plugins: { legend: { display: false } } }
-            })
+            new Chart(document.getElementById('productosChart'), { type: 'doughnut', data: { labels: ['Café', 'Té', 'Postres', 'Sándwiches', 'Bebidas'], datasets: [{ data: [42, 18, 22, 10, 8], backgroundColor: ['#7C9082', '#9CAF88', '#C4A484', '#D4C5B5', '#B5C4A2'] }] }, options: { cutout: '65%', plugins: { legend: { position: 'bottom' } } } })
+            new Chart(document.getElementById('ventasChart'), { type: 'line', data: { labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'], datasets: [{ data: [1240, 890, 1520, 1780, 2350, 1980, 1120], borderColor: '#7C9082', borderWidth: 2, tension: 0.3, fill: true }] }, options: { plugins: { legend: { display: false } } } })
         }
-        
         cargarTodo()
     </script>
 </body>
