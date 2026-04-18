@@ -89,7 +89,7 @@
                 <h3 style="margin-bottom:20px; color:#3E5C4B;">Nuevo cliente</h3>
                 <form onsubmit="guardarCliente(event)">
                     <div style="margin-bottom:16px;"><label>Nombre</label><input type="text" id="clienteNombre" required></div>
-                    <div style="margin-bottom:16px;"><label>Email</label><input type="email" id="clienteEmail" required></div>
+                    <div style="margin-bottom:16px;"><label>Email</label><input type="email" id="clienteEmail"></div>
                     <div style="margin-bottom:16px;"><label>Teléfono</label><input type="text" id="clienteTelefono"></div>
                     <div style="display:flex; gap:12px;"><button type="submit" class="btn" style="padding:12px;">Guardar</button><button type="button" class="btn-outline" onclick="cerrarModalCliente()">Cancelar</button></div>
                 </form>
@@ -104,7 +104,7 @@
         const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
         
         let pedidoActual = { mesa_id: null, cliente_id: null, items: [], metodo_pago: 'Efectivo' }
-        let productosData = [], categoriaActual = null, clienteEmailActual = null
+        let productosData = [], categoriaActual = null
         
         async function inicializar() { await cargarCategorias(); await cargarProductos(); await cargarMesas(); await cargarClientes(); await cargarPedidosActivos() }
         async function cargarCategorias() { const { data } = await supabase.from('categorias').select('*').order('nombre'); const filter = document.getElementById('categoriasFilter'); filter.innerHTML = '<button class="cat-btn active" onclick="filtrarPorCategoria(null)">Todos</button>' + (data||[]).map(c => `<button class="cat-btn" onclick="filtrarPorCategoria(${c.id})">${c.nombre}</button>`).join('') }
@@ -114,52 +114,20 @@
         async function cargarMesas() { const { data } = await supabase.from('mesas').select('*').order('numero'); const grid = document.getElementById('mesasGrid'); if (data) grid.innerHTML = data.map(m => `<div class="mesa-btn ${m.estado!=='Disponible'?'disabled':''}" onclick="seleccionarMesa(${m.id},'${m.estado}')">${m.numero}</div>`).join('') }
         window.seleccionarMesa = function(id, estado) { if (estado !== 'Disponible') { alert('Mesa no disponible'); return } document.querySelectorAll('.mesa-btn').forEach(btn => btn.classList.remove('active')); event.target.classList.add('active'); pedidoActual.mesa_id = id }
         async function cargarClientes() { const { data } = await supabase.from('clientes').select('*').order('nombre'); const select = document.getElementById('clienteSelect'); select.innerHTML = '<option value="">Cliente general</option>' + (data||[]).map(c => `<option value="${c.id}">${c.nombre}</option>`).join('') }
-        window.clienteSeleccionado = async function() { 
-            const id = document.getElementById('clienteSelect').value
-            pedidoActual.cliente_id = id || null
-            if (id) {
-                const { data } = await supabase.from('clientes').select('email').eq('id', id).single()
-                clienteEmailActual = data?.email || null
-            } else {
-                clienteEmailActual = null
-            }
-        }
+        window.clienteSeleccionado = function() { pedidoActual.cliente_id = document.getElementById('clienteSelect').value || null }
         window.mostrarFormCliente = () => document.getElementById('modalCliente').style.display = 'flex'
         window.cerrarModalCliente = () => document.getElementById('modalCliente').style.display = 'none'
         window.guardarCliente = async function(e) { 
             e.preventDefault()
-            const cliente = { 
-                nombre: document.getElementById('clienteNombre').value, 
-                email: document.getElementById('clienteEmail').value, 
-                telefono: document.getElementById('clienteTelefono').value || null, 
-                puntos_fidelidad: 0 
-            }
+            const cliente = { nombre: document.getElementById('clienteNombre').value, email: document.getElementById('clienteEmail').value || null, telefono: document.getElementById('clienteTelefono').value || null, puntos_fidelidad: 0 }
             const { data, error } = await supabase.from('clientes').insert(cliente).select()
-            if (!error) { 
-                cerrarModalCliente()
-                await cargarClientes()
-                document.getElementById('clienteSelect').value = data[0].id
-                pedidoActual.cliente_id = data[0].id
-                clienteEmailActual = data[0].email
-                document.getElementById('clienteNombre').value = ''
-                document.getElementById('clienteEmail').value = ''
-                document.getElementById('clienteTelefono').value = ''
-            } else {
-                alert('Error: ' + error.message)
-            }
+            if (!error) { cerrarModalCliente(); await cargarClientes(); document.getElementById('clienteSelect').value = data[0].id; pedidoActual.cliente_id = data[0].id; document.getElementById('clienteNombre').value = document.getElementById('clienteEmail').value = document.getElementById('clienteTelefono').value = '' }
         }
         window.agregarAlCarrito = function(id) { const p = productosData.find(x => x.id === id); if (!p) return; const item = pedidoActual.items.find(i => i.producto_id === id); item ? item.cantidad++ : pedidoActual.items.push({ producto_id: p.id, nombre: p.nombre, precio_unitario: p.precio, cantidad: 1 }); renderizarCarrito() }
         function renderizarCarrito() { const c = document.getElementById('carritoItems'); if (!pedidoActual.items.length) { c.innerHTML = '<p style="color:#7C9082; text-align:center; padding:20px;">Agrega productos</p>'; document.getElementById('subtotal').textContent = '$0.00'; document.getElementById('total').textContent = '$0.00'; return } c.innerHTML = pedidoActual.items.map((i, idx) => `<div class="carrito-item"><div class="carrito-item-info"><div class="carrito-item-nombre">${i.nombre}</div><div class="carrito-item-precio">$${Number(i.precio_unitario).toFixed(2)} c/u</div></div><div class="carrito-item-cantidad"><button class="cantidad-btn" onclick="cambiarCantidad(${idx},-1)">−</button><span>${i.cantidad}</span><button class="cantidad-btn" onclick="cambiarCantidad(${idx},1)">+</button></div></div>`).join(''); actualizarTotales() }
         window.cambiarCantidad = function(idx, delta) { const item = pedidoActual.items[idx]; item.cantidad += delta; if (item.cantidad <= 0) pedidoActual.items.splice(idx, 1); renderizarCarrito() }
         function actualizarTotales() { const subtotal = pedidoActual.items.reduce((s, i) => s + (i.precio_unitario * i.cantidad), 0); document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`; document.getElementById('total').textContent = `$${subtotal.toFixed(2)}` }
         window.seleccionarPago = function(m) { pedidoActual.metodo_pago = m; document.querySelectorAll('.pago-btn').forEach(b => { b.classList.remove('active'); if (b.dataset.pago === m) b.classList.add('active') }) }
-        
-        async function enviarFacturaEmail(pdfBase64, emailCliente, numeroFactura) {
-            const { error } = await supabase.functions.invoke('enviar-factura', {
-                body: { to: emailCliente, subject: `Factura #${numeroFactura} - Cafetería`, pdf: pdfBase64, facturaId: numeroFactura }
-            })
-            return !error
-        }
         
         window.finalizarPedido = async function() {
             const msg = document.getElementById('mensajePedido')
@@ -184,7 +152,7 @@
             
             let clienteNombre = 'Cliente general'
             if (pedidoActual.cliente_id) {
-                const { data: cli } = await supabase.from('clientes').select('puntos_fidelidad, nombre, email').eq('id', pedidoActual.cliente_id).single()
+                const { data: cli } = await supabase.from('clientes').select('puntos_fidelidad, nombre').eq('id', pedidoActual.cliente_id).single()
                 if (cli) {
                     await supabase.from('clientes').update({ puntos_fidelidad: cli.puntos_fidelidad + Math.floor(total/10) }).eq('id', pedidoActual.cliente_id)
                     clienteNombre = cli.nombre
@@ -233,20 +201,12 @@
             doc.setFontSize(10)
             doc.text(`Metodo de pago: ${pedidoActual.metodo_pago}`, 14, y)
             y += 15
-            doc.text('¡Gracias por su compra!', 105, y, { align: 'center' })
+            doc.text('Gracias por su compra', 105, y, { align: 'center' })
             
-            const pdfBase64 = doc.output('datauristring').split(',')[1]
-            
-            if (clienteEmailActual) {
-                await enviarFacturaEmail(pdfBase64, clienteEmailActual, pedidoId)
-                msg.innerHTML = '<div class="msg-success">Pedido registrado. Factura enviada por email.</div>'
-            } else {
-                doc.save(`Factura_${pedidoId}.pdf`)
-                msg.innerHTML = '<div class="msg-success">Pedido registrado. Factura descargada.</div>'
-            }
+            doc.save(`Factura_${pedidoId}.pdf`)
+            msg.innerHTML = '<div class="msg-success">Pedido registrado. Factura descargada.</div>'
             
             pedidoActual = { mesa_id: null, cliente_id: null, items: [], metodo_pago: 'Efectivo' }
-            clienteEmailActual = null
             renderizarCarrito()
             document.querySelectorAll('.mesa-btn').forEach(b => b.classList.remove('active'))
             document.getElementById('clienteSelect').value = ''
