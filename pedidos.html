@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pedidos · Cafetería</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', -apple-system, sans-serif; background: #F5F0E8; min-height: 100vh; padding: 24px; color: #3A3A3A; }
@@ -88,7 +89,7 @@
                 <h3 style="margin-bottom:20px; color:#3E5C4B;">Nuevo cliente</h3>
                 <form onsubmit="guardarCliente(event)">
                     <div style="margin-bottom:16px;"><label>Nombre</label><input type="text" id="clienteNombre" required></div>
-                    <div style="margin-bottom:16px;"><label>Email</label><input type="email" id="clienteEmail"></div>
+                    <div style="margin-bottom:16px;"><label>Email</label><input type="email" id="clienteEmail" required></div>
                     <div style="margin-bottom:16px;"><label>Teléfono</label><input type="text" id="clienteTelefono"></div>
                     <div style="display:flex; gap:12px;"><button type="submit" class="btn" style="padding:12px;">Guardar</button><button type="button" class="btn-outline" onclick="cerrarModalCliente()">Cancelar</button></div>
                 </form>
@@ -98,10 +99,13 @@
     <script type="module">
         const SUPABASE_URL = 'https://knciklpjeboeznbvajil.supabase.co'
         const SUPABASE_KEY = 'sb_publishable_8xwi4BOCYmqXx-VqdXuZwA_cmd5CeNj'
+        
         import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
         const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+        
         let pedidoActual = { mesa_id: null, cliente_id: null, items: [], metodo_pago: 'Efectivo' }
-        let productosData = [], categoriaActual = null
+        let productosData = [], categoriaActual = null, clienteEmailActual = null
+        
         async function inicializar() { await cargarCategorias(); await cargarProductos(); await cargarMesas(); await cargarClientes(); await cargarPedidosActivos() }
         async function cargarCategorias() { const { data } = await supabase.from('categorias').select('*').order('nombre'); const filter = document.getElementById('categoriasFilter'); filter.innerHTML = '<button class="cat-btn active" onclick="filtrarPorCategoria(null)">Todos</button>' + (data||[]).map(c => `<button class="cat-btn" onclick="filtrarPorCategoria(${c.id})">${c.nombre}</button>`).join('') }
         async function cargarProductos() { const { data } = await supabase.from('productos').select('*, categorias(nombre)').eq('disponible', true).order('nombre'); productosData = data || []; renderizarProductos() }
@@ -110,38 +114,152 @@
         async function cargarMesas() { const { data } = await supabase.from('mesas').select('*').order('numero'); const grid = document.getElementById('mesasGrid'); if (data) grid.innerHTML = data.map(m => `<div class="mesa-btn ${m.estado!=='Disponible'?'disabled':''}" onclick="seleccionarMesa(${m.id},'${m.estado}')">${m.numero}</div>`).join('') }
         window.seleccionarMesa = function(id, estado) { if (estado !== 'Disponible') { alert('Mesa no disponible'); return } document.querySelectorAll('.mesa-btn').forEach(btn => btn.classList.remove('active')); event.target.classList.add('active'); pedidoActual.mesa_id = id }
         async function cargarClientes() { const { data } = await supabase.from('clientes').select('*').order('nombre'); const select = document.getElementById('clienteSelect'); select.innerHTML = '<option value="">Cliente general</option>' + (data||[]).map(c => `<option value="${c.id}">${c.nombre}</option>`).join('') }
-        window.clienteSeleccionado = function() { pedidoActual.cliente_id = document.getElementById('clienteSelect').value || null }
+        window.clienteSeleccionado = async function() { 
+            const id = document.getElementById('clienteSelect').value
+            pedidoActual.cliente_id = id || null
+            if (id) {
+                const { data } = await supabase.from('clientes').select('email').eq('id', id).single()
+                clienteEmailActual = data?.email || null
+            } else {
+                clienteEmailActual = null
+            }
+        }
         window.mostrarFormCliente = () => document.getElementById('modalCliente').style.display = 'flex'
         window.cerrarModalCliente = () => document.getElementById('modalCliente').style.display = 'none'
-        window.guardarCliente = async function(e) { e.preventDefault(); const cliente = { nombre: document.getElementById('clienteNombre').value, email: document.getElementById('clienteEmail').value || null, telefono: document.getElementById('clienteTelefono').value || null, puntos_fidelidad: 0 }; const { data, error } = await supabase.from('clientes').insert(cliente).select(); if (!error) { cerrarModalCliente(); await cargarClientes(); document.getElementById('clienteSelect').value = data[0].id; pedidoActual.cliente_id = data[0].id; ['Nombre','Email','Telefono'].forEach(f => document.getElementById('cliente'+f).value = '') } }
+        window.guardarCliente = async function(e) { 
+            e.preventDefault()
+            const cliente = { 
+                nombre: document.getElementById('clienteNombre').value, 
+                email: document.getElementById('clienteEmail').value, 
+                telefono: document.getElementById('clienteTelefono').value || null, 
+                puntos_fidelidad: 0 
+            }
+            const { data, error } = await supabase.from('clientes').insert(cliente).select()
+            if (!error) { 
+                cerrarModalCliente()
+                await cargarClientes()
+                document.getElementById('clienteSelect').value = data[0].id
+                pedidoActual.cliente_id = data[0].id
+                clienteEmailActual = data[0].email
+                document.getElementById('clienteNombre').value = ''
+                document.getElementById('clienteEmail').value = ''
+                document.getElementById('clienteTelefono').value = ''
+            } else {
+                alert('Error: ' + error.message)
+            }
+        }
         window.agregarAlCarrito = function(id) { const p = productosData.find(x => x.id === id); if (!p) return; const item = pedidoActual.items.find(i => i.producto_id === id); item ? item.cantidad++ : pedidoActual.items.push({ producto_id: p.id, nombre: p.nombre, precio_unitario: p.precio, cantidad: 1 }); renderizarCarrito() }
         function renderizarCarrito() { const c = document.getElementById('carritoItems'); if (!pedidoActual.items.length) { c.innerHTML = '<p style="color:#7C9082; text-align:center; padding:20px;">Agrega productos</p>'; document.getElementById('subtotal').textContent = '$0.00'; document.getElementById('total').textContent = '$0.00'; return } c.innerHTML = pedidoActual.items.map((i, idx) => `<div class="carrito-item"><div class="carrito-item-info"><div class="carrito-item-nombre">${i.nombre}</div><div class="carrito-item-precio">$${Number(i.precio_unitario).toFixed(2)} c/u</div></div><div class="carrito-item-cantidad"><button class="cantidad-btn" onclick="cambiarCantidad(${idx},-1)">−</button><span>${i.cantidad}</span><button class="cantidad-btn" onclick="cambiarCantidad(${idx},1)">+</button></div></div>`).join(''); actualizarTotales() }
         window.cambiarCantidad = function(idx, delta) { const item = pedidoActual.items[idx]; item.cantidad += delta; if (item.cantidad <= 0) pedidoActual.items.splice(idx, 1); renderizarCarrito() }
         function actualizarTotales() { const subtotal = pedidoActual.items.reduce((s, i) => s + (i.precio_unitario * i.cantidad), 0); document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`; document.getElementById('total').textContent = `$${subtotal.toFixed(2)}` }
         window.seleccionarPago = function(m) { pedidoActual.metodo_pago = m; document.querySelectorAll('.pago-btn').forEach(b => { b.classList.remove('active'); if (b.dataset.pago === m) b.classList.add('active') }) }
+        
+        async function enviarFacturaEmail(pdfBase64, emailCliente, numeroFactura) {
+            const { error } = await supabase.functions.invoke('enviar-factura', {
+                body: { to: emailCliente, subject: `Factura #${numeroFactura} - Cafetería`, pdf: pdfBase64, facturaId: numeroFactura }
+            })
+            return !error
+        }
+        
         window.finalizarPedido = async function() {
             const msg = document.getElementById('mensajePedido')
             if (!pedidoActual.mesa_id) { msg.innerHTML = '<div class="msg-error">Selecciona una mesa</div>'; return }
             if (!pedidoActual.items.length) { msg.innerHTML = '<div class="msg-error">Agrega productos</div>'; return }
+            
             const total = pedidoActual.items.reduce((s, i) => s + (i.precio_unitario * i.cantidad), 0)
-            const { data: empleado } = await supabase.from('empleados').select('id').limit(1).single()
-            const { data: pedido, error: errPed } = await supabase.from('pedidos').insert({ total, estado: 'Pendiente', cliente_id: pedidoActual.cliente_id || null, empleado_id: empleado?.id || null, mesa_id: pedidoActual.mesa_id }).select()
+            const { data: empleado } = await supabase.from('empleados').select('id, nombre, apellido').limit(1).single()
+            
+            const { data: pedido, error: errPed } = await supabase.from('pedidos').insert({
+                total, estado: 'Pendiente', cliente_id: pedidoActual.cliente_id || null,
+                empleado_id: empleado?.id || null, mesa_id: pedidoActual.mesa_id
+            }).select()
+            
             if (errPed) { msg.innerHTML = `<div class="msg-error">Error: ${errPed.message}</div>`; return }
+            
             const pedidoId = pedido[0].id
             const items = pedidoActual.items.map(i => ({ pedido_id: pedidoId, producto_id: i.producto_id, cantidad: i.cantidad, precio_unitario: i.precio_unitario }))
             await supabase.from('items_pedido').insert(items)
             await supabase.from('transacciones').insert({ pedido_id: pedidoId, monto: total, metodo_pago: pedidoActual.metodo_pago, estado: 'Completado' })
             await supabase.from('mesas').update({ estado: 'Ocupada' }).eq('id', pedidoActual.mesa_id)
-            if (pedidoActual.cliente_id) { const { data: cli } = await supabase.from('clientes').select('puntos_fidelidad').eq('id', pedidoActual.cliente_id).single(); if (cli) await supabase.from('clientes').update({ puntos_fidelidad: cli.puntos_fidelidad + Math.floor(total/10) }).eq('id', pedidoActual.cliente_id) }
-            msg.innerHTML = '<div class="msg-success">Pedido registrado</div>'
+            
+            let clienteNombre = 'Cliente general'
+            if (pedidoActual.cliente_id) {
+                const { data: cli } = await supabase.from('clientes').select('puntos_fidelidad, nombre, email').eq('id', pedidoActual.cliente_id).single()
+                if (cli) {
+                    await supabase.from('clientes').update({ puntos_fidelidad: cli.puntos_fidelidad + Math.floor(total/10) }).eq('id', pedidoActual.cliente_id)
+                    clienteNombre = cli.nombre
+                }
+            }
+            
+            const { data: mesa } = await supabase.from('mesas').select('numero').eq('id', pedidoActual.mesa_id).single()
+            
+            const { jsPDF } = window.jspdf
+            const doc = new jsPDF()
+            doc.setFontSize(20)
+            doc.text('CAFETERIA ARTESANAL', 105, 20, { align: 'center' })
+            doc.setFontSize(10)
+            doc.text('Sistema de Facturacion', 105, 28, { align: 'center' })
+            doc.text('----------------------------------------', 105, 34, { align: 'center' })
+            doc.setFontSize(11)
+            doc.text(`Factura #: ${pedidoId}`, 14, 44)
+            doc.text(`Fecha: ${new Date().toLocaleString('es')}`, 14, 52)
+            doc.text(`Cliente: ${clienteNombre}`, 14, 60)
+            doc.text(`Mesa: ${mesa?.numero || 'N/A'}`, 14, 68)
+            doc.text(`Atendio: ${empleado ? empleado.nombre + ' ' + empleado.apellido : 'Sistema'}`, 14, 76)
+            doc.text('----------------------------------------', 105, 84, { align: 'center' })
+            let y = 94
+            doc.setFontSize(10)
+            doc.text('CANT', 14, y)
+            doc.text('DESCRIPCION', 40, y)
+            doc.text('P.UNIT', 140, y)
+            doc.text('SUBTOTAL', 180, y)
+            y += 6
+            doc.text('----------------------------------------', 105, y, { align: 'center' })
+            y += 8
+            pedidoActual.items.forEach(item => {
+                const subtotal = item.precio_unitario * item.cantidad
+                doc.text(String(item.cantidad), 14, y)
+                doc.text(item.nombre.substring(0, 30), 40, y)
+                doc.text(`$${Number(item.precio_unitario).toFixed(2)}`, 140, y)
+                doc.text(`$${subtotal.toFixed(2)}`, 180, y)
+                y += 7
+            })
+            y += 3
+            doc.text('----------------------------------------', 105, y, { align: 'center' })
+            y += 8
+            doc.setFontSize(12)
+            doc.text(`TOTAL: $${total.toFixed(2)}`, 180, y)
+            y += 8
+            doc.setFontSize(10)
+            doc.text(`Metodo de pago: ${pedidoActual.metodo_pago}`, 14, y)
+            y += 15
+            doc.text('¡Gracias por su compra!', 105, y, { align: 'center' })
+            
+            const pdfBase64 = doc.output('datauristring').split(',')[1]
+            
+            if (clienteEmailActual) {
+                await enviarFacturaEmail(pdfBase64, clienteEmailActual, pedidoId)
+                msg.innerHTML = '<div class="msg-success">Pedido registrado. Factura enviada por email.</div>'
+            } else {
+                doc.save(`Factura_${pedidoId}.pdf`)
+                msg.innerHTML = '<div class="msg-success">Pedido registrado. Factura descargada.</div>'
+            }
+            
             pedidoActual = { mesa_id: null, cliente_id: null, items: [], metodo_pago: 'Efectivo' }
+            clienteEmailActual = null
             renderizarCarrito()
             document.querySelectorAll('.mesa-btn').forEach(b => b.classList.remove('active'))
             document.getElementById('clienteSelect').value = ''
             await cargarMesas()
             await cargarPedidosActivos()
         }
-        async function cargarPedidosActivos() { const { data } = await supabase.from('pedidos').select('*, mesas(numero)').in('estado', ['Pendiente','En_Preparacion']).order('fecha_hora', { ascending: false }); const c = document.getElementById('pedidosActivos'); document.getElementById('countActivos').textContent = data?.length || 0; c.innerHTML = data?.length ? data.map(p => `<div style="padding:10px 0; border-bottom:1px solid rgba(156,175,136,0.1);"><div class="flex-between"><span><strong>Mesa ${p.mesas?.numero||'?'}</strong></span><span class="badge">${p.estado}</span></div><div style="font-size:13px; color:#7C9082;">Total: $${Number(p.total).toFixed(2)}</div></div>`).join('') : '<p style="color:#7C9082; font-size:13px;">Sin pedidos activos</p>' }
+        
+        async function cargarPedidosActivos() { 
+            const { data } = await supabase.from('pedidos').select('*, mesas(numero)').in('estado', ['Pendiente','En_Preparacion']).order('fecha_hora', { ascending: false })
+            document.getElementById('countActivos').textContent = data?.length || 0
+            document.getElementById('pedidosActivos').innerHTML = data?.length ? data.map(p => `<div style="padding:10px 0; border-bottom:1px solid rgba(156,175,136,0.1);"><div class="flex-between"><span><strong>Mesa ${p.mesas?.numero||'?'}</strong></span><span class="badge">${p.estado}</span></div><div style="font-size:13px; color:#7C9082;">Total: $${Number(p.total).toFixed(2)}</div></div>`).join('') : '<p style="color:#7C9082;">Sin pedidos activos</p>'
+        }
+        
         window.filtrarPorCategoria = filtrarPorCategoria
         window.seleccionarMesa = seleccionarMesa
         window.clienteSeleccionado = clienteSeleccionado
@@ -152,6 +270,7 @@
         window.cambiarCantidad = cambiarCantidad
         window.seleccionarPago = seleccionarPago
         window.finalizarPedido = finalizarPedido
+        
         inicializar()
     </script>
 </body>
